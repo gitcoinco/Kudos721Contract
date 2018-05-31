@@ -1,5 +1,5 @@
 # dependencies
-node_modules
+erc721/node_modules
 
 # mac files
 .DS_Store
