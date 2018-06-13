@@ -1,8 +1,8 @@
 # dependencies
-erc721/node_modules
+node_modules/
 
 # contract builds
-erc721/build
+build/
 
 # mac files
 .DS_Store
