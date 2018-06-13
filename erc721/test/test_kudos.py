@@ -5,7 +5,7 @@ from web3 import Web3
 with open('build/contracts/Kudos.json') as f:
     abi = json.load(f)['abi']
 
-checksummed = Web3.toChecksumAddress('0x567f687733a5046ba57b5dbb73f67ed870aebb64')
+checksummed = Web3.toChecksumAddress('0xf9b7f7c22b24e002644a0250c337af5072243ae5')
 
 kudos = w3.eth.contract(address=checksummed, abi=abi)
 
