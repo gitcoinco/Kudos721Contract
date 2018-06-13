@@ -26,9 +26,9 @@ contract Kudos is ERC721Token("KudosToken", "KDO") {
 
     function clone(string name) public {
         require(nameToNumClonesAvail[name] != 0);
-        nameToNumClonesAvail[name] -= 1;
         uint256 tokenId = allTokens.length + 1;
         _mint(msg.sender, tokenId);
+        nameToNumClonesAvail[name] -= 1;
     }
 
     function getTokenName(uint256 tokenId) view public returns (string) {
