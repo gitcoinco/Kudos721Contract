@@ -5,62 +5,65 @@ import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
 
 contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
 
-    mapping(uint256 => string) internal tokenIdToName;
-    mapping(string => uint256) internal nameToTokenId;
-    mapping(uint256 => string) internal tokenIdToDescription;
-    mapping(uint256 => uint256) internal tokenIdToRareness;
-    mapping(uint256 => uint256) internal tokenIdToPrice;
-    mapping(string => uint256) internal nameToNumClonesAvail;
-    mapping(string => uint256) internal nameToNumClonesInWild;
+    struct Kudo {
+        string name;
+        string description;
+        uint256 rareness;
+        uint256 price;
+        uint256 numClonesAllowed;
+        uint256 numClonesInWild;
+    }
 
-    function create(string name, string description, uint256 rareness, uint256 price, uint256 numClonesAllowed) public onlyOwner {
+    Kudo[] public kudos;
+
+    mapping(string => uint256) internal nameToTokenId;
+
+    function create(string name, string description, uint256 rareness, uint256 price, uint256 numClonesAllowed) public  {
         require(nameToTokenId[name] == 0);
-        uint256 tokenId = allTokens.length + 1;
+        uint256 _numClonesInWild = 0;
+
+        Kudo memory _kudo = Kudo({name: name, description: description, rareness: rareness, price: price, numClonesAllowed: numClonesAllowed, numClonesInWild: _numClonesInWild});
+        uint256 tokenId = kudos.push(_kudo) - 1;
+
         _mint(msg.sender, tokenId);
 
         nameToTokenId[name] = tokenId;
-        tokenIdToName[tokenId] = name;
-        tokenIdToDescription[tokenId] = description;
-        tokenIdToRareness[tokenId] = rareness;
-        tokenIdToPrice[tokenId] = price;
-        nameToNumClonesAvail[name] = numClonesAllowed;
-        nameToNumClonesInWild[name] = 0;
     }
 
     function clone(string name) public {
-        require(nameToNumClonesAvail[name] != 0);
-        uint256 tokenId = allTokens.length + 1;
+        // Grab existing Kudo blueprint
+        Kudo memory _kudo = kudos[nameToTokenId[name]];
+        require(_kudo.numClonesInWild < _kudo.numClonesAllowed);
+
+        // Update original kudo struct in the array
+        _kudo.numClonesInWild += 1;
+        kudos[nameToTokenId[name]] = _kudo;
+
+        // Create new kudo, don't let it be cloned
+        Kudo memory _newKudo = _kudo;
+        _newKudo.numClonesAllowed = 0;
+        _newKudo.numClonesInWild = _kudo.numClonesInWild;
+
+        // The new kudo is pushed onto the array and minted
+        uint256 tokenId = kudos.push(_newKudo) - 1;
         _mint(msg.sender, tokenId);
-        nameToNumClonesInWild[name] += 1;
-        nameToNumClonesAvail[name] -= 1;
+
     }
 
-    function getTokenName(uint256 tokenId) view public returns (string) {
-        return tokenIdToName[tokenId];
+    function getKudoById(uint256 tokenId) view public returns (string name, string description, uint256 rareness, uint256 price, uint256 numClonesAllowed, uint256 numClonesInWild) {
+        Kudo memory _kudo = kudos[tokenId];
+
+        name = _kudo.name;
+        description = _kudo.description;
+        rareness = _kudo.rareness;
+        price = _kudo.price;
+        numClonesAllowed = _kudo.numClonesAllowed;
+        numClonesInWild = _kudo.numClonesInWild;
     }
+
 
     function getTokenId(string name) view public returns (uint256) {
         return nameToTokenId[name];
-    }
-
-    function getTokenDescription(uint256 tokenId) view public returns (string) {
-        return tokenIdToDescription[tokenId];
-    }
-
-    function getTokenRareness(uint256 tokenId) view public returns (uint256) {
-        return tokenIdToRareness[tokenId];
-    }
-
-    function getTokenPrice(uint256 tokenId) view public returns (uint256) {
-        return tokenIdToPrice[tokenId];
-    }
-
-    function getNumClonesInWild(string name) view public returns (uint256) {
-        return nameToNumClonesInWild[name];
-    }
-
-    function getNumClonesAvail(string name) view public returns (uint256) {
-        return nameToNumClonesAvail[name];
     }
 
 }
