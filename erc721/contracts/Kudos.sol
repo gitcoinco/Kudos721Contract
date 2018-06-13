@@ -6,20 +6,44 @@ contract Kudos is ERC721Token("KudosToken", "KDO") {
 
     mapping(uint256 => string) internal tokenIdToName;
     mapping(string => uint256) internal nameToTokenId;
+    mapping(uint256 => string) internal tokenIdToDescription;
+    mapping(uint256 => uint256) internal tokenIdToRareness;
+    mapping(uint256 => uint256) internal tokenIdToPrice;
+    mapping(string => uint256) internal nameToNumClonesAvail;
 
-    function create(string name) public {
+    function create(string name, string description, uint256 rareness, uint256 price) public {
         require(nameToTokenId[name] == 0);
         uint256 tokenId = allTokens.length + 1;
         _mint(msg.sender, tokenId);
-        tokenIdToName[tokenId] = name;
         nameToTokenId[name] = tokenId;
+        tokenIdToName[tokenId] = name;
+        tokenIdToDescription[tokenId] = description;
+        tokenIdToRareness[tokenId] = rareness;
+        tokenIdToPrice[tokenId] = price;
+    }
+
+    function clone(string name) public {
+        require(nameToNumClonesAvail[name] != 0);
     }
 
     function getTokenName(uint256 tokenId) view public returns (string) {
         return tokenIdToName[tokenId];
     }
 
-    function getTokenId(string name) view public returns (uint) {
+    function getTokenId(string name) view public returns (uint256) {
         return nameToTokenId[name];
     }
+
+    function getTokenDescription(uint256 tokenId) view public returns (string) {
+        return tokenIdToDescription[tokenId];
+    }
+
+    function getTokenRareness(uint256 tokenId) view public returns (uint256) {
+        return tokenIdToRareness[tokenId];
+    }
+
+    function getTokenPrice(uint256 tokenId) view public returns (uint256) {
+        return tokenIdToPrice[tokenId];
+    }
+
 }
