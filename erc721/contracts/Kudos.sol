@@ -11,19 +11,24 @@ contract Kudos is ERC721Token("KudosToken", "KDO") {
     mapping(uint256 => uint256) internal tokenIdToPrice;
     mapping(string => uint256) internal nameToNumClonesAvail;
 
-    function create(string name, string description, uint256 rareness, uint256 price) public {
+    function create(string name, string description, uint256 rareness, uint256 price, uint256 numClonesAllowed) public {
         require(nameToTokenId[name] == 0);
         uint256 tokenId = allTokens.length + 1;
         _mint(msg.sender, tokenId);
+
         nameToTokenId[name] = tokenId;
         tokenIdToName[tokenId] = name;
         tokenIdToDescription[tokenId] = description;
         tokenIdToRareness[tokenId] = rareness;
         tokenIdToPrice[tokenId] = price;
+        nameToNumClonesAvail[name] = numClonesAllowed;
     }
 
     function clone(string name) public {
         require(nameToNumClonesAvail[name] != 0);
+        nameToNumClonesAvail[name] -= 1;
+        uint256 tokenId = allTokens.length + 1;
+        _mint(msg.sender, tokenId);
     }
 
     function getTokenName(uint256 tokenId) view public returns (string) {
