@@ -8,7 +8,7 @@
   </head>
   <body>
 
-    <div class="container have-some-margin" align="center">
+    <div class="container" align="center">
       <h1 class="display-2">Kudos</h1>
       <p class="lead">by Gitcoin</p>
     </div>
@@ -62,78 +62,86 @@
 
     <!-- Available Kudos in marketplace -->
     <div class="container have-some-margin" align="center">
-      <h4>Choose a Kudos!</h4>
+      <h4>Choose a Kudos to mint!</h4>
 
-      <!-- 3 kudos per row -->
+      <!-- 4 kudos per row -->
       <div class="row justify-content-center">
-        <div class="card" style="width: 18rem;">
-          <img class="card-img-top" src="https://robohash.org/bugsquasher" alt="Card image cap">
+        <div class="card" style="width: 15rem;">
+          <img class="card-img-top" src="https://robohash.org/bug_squasher" alt="Card image cap">
           <div class="card-body">
             <p class="card-text">Bug Squasher</p>
             <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
           </div>
         </div>
-        <div class="card" style="width: 18rem;">
-          <img class="card-img-top" src="https://robohash.org/collaborationmachine" alt="Card image cap">
+        <div class="card" style="width: 15rem;">
+          <img class="card-img-top" src="https://robohash.org/collaboration_machine" alt="Card image cap">
           <div class="card-body">
             <p class="card-text">Collaboration Machine</p>
             <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
           </div>
         </div>
-        <div class="card" style="width: 18rem;">
-          <img class="card-img-top" src="https://robohash.org/designstar" alt="Card image cap">
+        <div class="card" style="width: 15rem;">
+          <img class="card-img-top" src="https://robohash.org/design_star" alt="Card image cap">
           <div class="card-body">
             <p class="card-text">Design Star</p>
             <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
           </div>
         </div>
-      </div>
-
-      <!-- 3 kudos per row -->
-      <div class="row justify-content-center">
-        <div class="card" style="width: 18rem;">
-          <img class="card-img-top" src="https://robohash.org/fastturnaround" alt="Card image cap">
+        <div class="card" style="width: 15rem;">
+          <img class="card-img-top" src="https://robohash.org/fast_turnaround" alt="Card image cap">
           <div class="card-body">
             <p class="card-text">Fast Turn Around</p>
             <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
           </div>
         </div>
-        <div class="card" style="width: 18rem;">
-          <img class="card-img-top" src="https://robohash.org/helpinghand" alt="Card image cap">
+      </div>
+
+      <!-- 4 kudos per row -->
+      <div class="row justify-content-center">
+        <div class="card" style="width: 15rem;">
+          <img class="card-img-top" src="https://robohash.org/helping_hand" alt="Card image cap">
           <div class="card-body">
             <p class="card-text">Helping Hand</p>
             <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
           </div>
         </div>
-        <div class="card" style="width: 18rem;">
-          <img class="card-img-top" src="https://robohash.org/problemsolver" alt="Card image cap">
+        <div class="card" style="width: 15rem;">
+          <img class="card-img-top" src="https://robohash.org/problem_solver" alt="Card image cap">
           <div class="card-body">
             <p class="card-text">Problem Solver</p>
             <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
           </div>
         </div>
-      </div>
-
-      <div class="row justify-content-center">
-        <div class="card" style="width: 18rem;">
+        <div class="card" style="width: 15rem;">
           <img class="card-img-top" src="https://robohash.org/pythonista" alt="Card image cap">
           <div class="card-body">
             <p class="card-text">Pythonista</p>
             <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
           </div>
         </div>
+        <div class="card" style="width: 15rem;">
+          <img class="card-img-top" src="https://vignette.wikia.nocookie.net/uncyclopedia/images/a/a3/F-spot-question-mark.png/revision/latest?cb=20070121222858" alt="Card image cap">
+          <div class="card-body">
+            <p class="card-text">Make your own</p>
+            <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
+          </div>
+        </div>
       </div>
 
     </div>
 
+    <div class="container have-some-margin" align="center">
+      <h1 class="display-2">Your Kudos</h1>
+    </div>
+
     <!-- Show kudos that you own -->
     <div class="container">
-        <label> Your Kudos</label> <img id="loading" src="loading.gif" height="40px" width="auto" style="visibility: hidden"/>
-        <div id="owner-kudos"></div>
+        <label></label> <img id="loading" src="loading.gif" height="40px" width="auto" style="visibility: hidden"/>
+        <div class="row justify-content-center" id=owner-kudos></div>
     </div>
 
   </body>
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
   <script src="js/web3.min.js"></script>

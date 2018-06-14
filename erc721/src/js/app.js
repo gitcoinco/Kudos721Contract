@@ -96,17 +96,15 @@ App = {
         kudosContractInstance = instance;
         return kudosContractInstance.balanceOf(account)
       }).then((result) => { 
-        console.log('kudos balance:' + parseInt(result, 10));
-        // for (let index = 0; index < result; index++) {
-          
-        // }
-        return 0
-      }).then((result) => {
-        kudosId = result;
-        return kudosContractInstance.getKudoById(kudosId)
-      }).then((result) => {
-        kudos = result;
-        App.addKudosArtifact(kudosId, kudos)
+        const balance = parseInt(result);
+        console.log('kudos balance:' + balance);
+        for (let index = 0; index < balance; index++) {
+          kudosContractInstance.tokenOfOwnerByIndex(account, index).then((kudosId) => {
+            kudosContractInstance.getKudoById(kudosId).then((kudos) => {
+              App.addKudosArtifact(kudosId, kudos)
+            })
+          })
+        }
       }).catch(function(err) {
         console.log(err.message);
       });
@@ -117,7 +115,7 @@ App = {
 
     let cardElement = document.createElement('div')
     cardElement.setAttribute('class', 'card')
-    cardElement.setAttribute('style', 'width: 18rem;')
+    cardElement.setAttribute('style', 'width: 10rem;')
 
     let cardImage = document.createElement('img')
     cardImage.setAttribute('class', 'card-img-top')
@@ -129,7 +127,7 @@ App = {
 
     let cardText = document.createElement('p')
     cardText.setAttribute('class', 'card-text')
-    cardText.value = kudos[0]
+    cardText.innerHTML = kudos[0]
 
     cardBody.appendChild(cardText)
     cardElement.appendChild(cardImage)

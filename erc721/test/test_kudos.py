@@ -5,53 +5,53 @@ from web3 import Web3
 with open('build/contracts/Kudos.json') as f:
     abi = json.load(f)['abi']
 
-checksummed = Web3.toChecksumAddress('0xf9b7f7c22b24e002644a0250c337af5072243ae5')
+checksummed = Web3.toChecksumAddress('0x0aacb7c96b002d3939ed5ceb7e079d79227e210d')
 
 kudos = w3.eth.contract(address=checksummed, abi=abi)
 
-bugsquasher = dict(name='Bugsquasher',
+bugsquasher = dict(name='bug_squasher',
                    description='exterminator',
                    rareness=1234,
                    price=50000,
                    numClonesAllowed=3
                    )
 
-collabmachine = dict(name='Collaborationmachine',
+collabmachine = dict(name='collaboration_machine',
                      description='plays nice with others',
                      rareness=1234,
                      price=50000,
                      numClonesAllowed=3
                      )
 
-designstar = dict(name='Designstar',
+designstar = dict(name='design_star',
                   description='makes nice things',
                   rareness=1234,
                   price=50000,
                   numClonesAllowed=3
                   )
 
-fastturn = dict(name='Fastturnaround',
+fastturn = dict(name='fast_turnaround',
                 description='speedy gonzalez',
                 rareness=1234,
                 price=50000,
                 numClonesAllowed=3
                 )
 
-helpinghand = dict(name='Helpinghand',
+helpinghand = dict(name='helping_hand',
                    description='like a good neighbor',
                    rareness=1234,
                    price=50000,
                    numClonesAllowed=3
                    )
 
-problemsolver = dict(name='Problemsolver',
+problemsolver = dict(name='problem_solver',
                      description='exterminator',
                      rareness=1234,
                      price=50000,
                      numClonesAllowed=3
                      )
 
-pythonista = dict(name='Pythonista',
+pythonista = dict(name='pythonista',
                   description='follows the zen of python',
                   rareness=1234,
                   price=50000,
