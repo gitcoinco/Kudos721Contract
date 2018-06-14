@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Kudos by Gitcoin</title>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link href='https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
+    <link href='index.css' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+
+    <div class="container have-some-margin" align="center">
+      <h1 class="display-2">Kudos</h1>
+      <p class="lead">by Gitcoin</p>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="kudosModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Design your Kudos</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group row">
+                <label for="staticName" class="col-sm-4 col-form-label">Name</label>
+                <div class="col-sm-8">
+                  <input type="text" readonly class="form-control-plaintext" id="staticName" value="Some name">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="staticDescription" class="col-sm-4 col-form-label">Description</label>
+                <div class="col-sm-8">
+                  <input type="text" readonly class="form-control-plaintext" id="staticDescription" value="Some description">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="formControlRange">Rarity</label>
+                <input type="range" class="form-control-range" id="formControlRange">
+                <small id="rarityHelp" class="form-text text-muted">lowest to highest</small>
+              </div>
+              <div class="form-group">
+                <label for="priceInput">Price</label>
+                <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter price in ETH">
+              </div>
+              <div class="form-group">
+                <label for="numClonesInput">Number of clones allowed</label>
+                <input type="text" class="form-control" id="numClonesInput" aria-describedby="emailHelp" placeholder="Enter number">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Mint</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Available Kudos in marketplace -->
+    <div class="container have-some-margin" align="center">
+      <h4>Choose a Kudos!</h4>
+
+      <!-- 3 kudos per row -->
+      <div class="row justify-content-center">
+        <div class="card" style="width: 18rem;">
+          <img class="card-img-top" src="https://robohash.org/bugsquasher" alt="Card image cap">
+          <div class="card-body">
+            <p class="card-text">Bug Squasher</p>
+            <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
+          </div>
+        </div>
+        <div class="card" style="width: 18rem;">
+          <img class="card-img-top" src="https://robohash.org/collaborationmachine" alt="Card image cap">
+          <div class="card-body">
+            <p class="card-text">Collaboration Machine</p>
+            <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
+          </div>
+        </div>
+        <div class="card" style="width: 18rem;">
+          <img class="card-img-top" src="https://robohash.org/designstar" alt="Card image cap">
+          <div class="card-body">
+            <p class="card-text">Design Star</p>
+            <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 kudos per row -->
+      <div class="row justify-content-center">
+        <div class="card" style="width: 18rem;">
+          <img class="card-img-top" src="https://robohash.org/fastturnaround" alt="Card image cap">
+          <div class="card-body">
+            <p class="card-text">Fast Turn Around</p>
+            <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
+          </div>
+        </div>
+        <div class="card" style="width: 18rem;">
+          <img class="card-img-top" src="https://robohash.org/helpinghand" alt="Card image cap">
+          <div class="card-body">
+            <p class="card-text">Helping Hand</p>
+            <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
+          </div>
+        </div>
+        <div class="card" style="width: 18rem;">
+          <img class="card-img-top" src="https://robohash.org/problemsolver" alt="Card image cap">
+          <div class="card-body">
+            <p class="card-text">Problem Solver</p>
+            <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row justify-content-center">
+        <div class="card" style="width: 18rem;">
+          <img class="card-img-top" src="https://robohash.org/pythonista" alt="Card image cap">
+          <div class="card-body">
+            <p class="card-text">Pythonista</p>
+            <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Show kudos that you own -->
+    <div class="container">
+        <label> Your Kudos</label> <img id="loading" src="loading.gif" height="40px" width="auto" style="visibility: hidden"/>
+        <div id="owner-kudos"></div>
+    </div>
+
+  </body>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+  <script src="js/web3.min.js"></script>
+  <script src="js/truffle-contract.js"></script>
+  <script src="js/app.js"></script>
+</html>
+
+
+
+

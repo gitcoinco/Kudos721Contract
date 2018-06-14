@@ -1,0 +1,15 @@
+.color-preview { 
+  height: 100px;
+  width: 100px;
+}
+
+.color-blocks { 
+  height: 100px;
+  width: 100px;
+  margin-right: 20px;
+  margin-bottom: 15px;
+}
+
+.have-some-margin { 
+  margin-top: 100px;
+}
