@@ -31,9 +31,14 @@ App = {
       // Set the provider for our contract.
       App.contracts.KudosToken.setProvider(App.web3Provider);
 
-      // Use our contract to retieve and mark the adopted pets.
+      // Use our contract to retieve the user's existing Kudos.
       return App.getKudosForUser();
-    });
+    }).done(function(done) {
+    console.log( "done data: " + done);
+  })
+  .fail(function(err) {
+    console.log(err);
+  });
 
     return App.bindEvents();
   },
@@ -89,12 +94,19 @@ App = {
 
       App.contracts.KudosToken.deployed().then(function(instance) {
         kudosContractInstance = instance;
-        return kudosContractInstance.tokensOf(account)
+        return kudosContractInstance.balanceOf(account)
       }).then((result) => { 
-        result.forEach((kudosId) => {
-          kudos = kudosContractInstance.getKudoById(kudosId) // returns a single kudo struct as an array
-          App.addKudosArtifact(kudosId, kudos)
-        })
+        console.log('kudos balance:' + parseInt(result, 10));
+        // for (let index = 0; index < result; index++) {
+          
+        // }
+        return 0
+      }).then((result) => {
+        kudosId = result;
+        return kudosContractInstance.getKudoById(kudosId)
+      }).then((result) => {
+        kudos = result;
+        App.addKudosArtifact(kudosId, kudos)
       }).catch(function(err) {
         console.log(err.message);
       });
@@ -138,7 +150,7 @@ App = {
 };
 
 $(function() {
-  $(window).load(function() {
+  $(window).on('load', (function() {
     App.init();
-  });
+  }));
 });
