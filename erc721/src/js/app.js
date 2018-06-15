@@ -1,13 +1,46 @@
 // replace with IPFS hashes
-var imageMapping = {
-  'bugsquasher': 'images/devflare-bugsquasher.svg',
-  'collaborationmachine': 'images/devflare-collaborationmachine.svg',
-  'designstar': 'images/devflare-designstar.svg',
-  'fastturnaround': 'images/devflare-fastturnaround.svg',
-  'helpinghand': 'images/devflare-helpinghand.svg',
-  'problemsolver': 'images/devflare-problemsolver.svg',
-  'pythonista': 'images/devflare-pythonista.svg',
-  'meeseeks': 'images/meeseeks.jpg'
+
+const kudosMap = {
+  bugsquasher: {
+    name: 'Bug Squasher',
+    description: 'The bug terminator',
+    image: 'images/devflare-bugsquasher.svg'
+  },
+  collaborationmachine: {
+    name: 'Collaboration Machine',
+    description: 'Plays nice with others',
+    image: 'images/devflare-collaborationmachine.svg'
+  },
+  designstar: {
+    name: 'Design Star',
+    description: 'Just so good looking',
+    image: 'images/devflare-designstar.svg'
+  },
+  fastturnaround: {
+    name: 'Fast Turnaround',
+    description: 'Speedy Gonzalez',
+    image: 'images/devflare-fastturnaround.svg'
+  },
+  helpinghand: {
+    name: 'Helping Hand',
+    description: 'Like a good neighbor',
+    image: 'images/devflare-helpinghand.svg'
+  },
+  problemsolver: {
+    name: 'Problem Solver',
+    description: 'Nothing is impossible',
+    image: 'images/devflare-problemsolver.svg'
+  },
+  pythonista: {
+    name: 'Pythonista',
+    description: 'Zen-like',
+    image: 'images/devflare-pythonista.svg'
+  },
+  meeseeks: {
+    name: 'Mr. Meeseeks',
+    description: 'Existence is pain!',
+    image: 'images/meeseeks.jpg'
+  },
 }
 
 App = {
@@ -45,7 +78,6 @@ App = {
       // Use our contract to retieve the user's existing Kudos.
       return App.getKudosForUser();
     }).done(function(done) {
-    console.log( "done data: " + done);
   })
   .fail(function(err) {
     console.log(err);
@@ -55,49 +87,79 @@ App = {
   },
 
   bindEvents: function() {
+    // Mint a gen0 Kudos
+    $('#btnMintGen0').click(function(event) {
+      $('#kudosModalBlank').modal()
+      $('#staticMintDescription').val(kudosMap[$('#nameInput').val()].description)
+      $('#nameInput').change(function () {
+        $('#staticMintDescription').val(kudosMap[$(this).val()].description)
+      })
+    })
+
     $('#mint-modal-blank').on('click', function(event) {
       let newKudo = {
         'name': $('#nameInput').val().trim(),
-        'description': $('#descriptionInput').val().trim(),
+        'description': $('#staticMintDescription').val().trim(),
         'rarity': $('#rarityInput').val().trim(),
         'price': parseInt(parseFloat($('#priceInput').val().trim(), 10) * 1000, 10),  // convert from Ether to Finney
-        'numClonesAllowed': parseInt($('#numClonesAllowedInput').val().trim(), 10),
-        'description': $('#descriptionInput').val().trim(),
+        'numClonesAllowed': parseInt($('#numClonesAllowedInput').val().trim(), 10), 
       }
-      console.log(newKudo);
+
       event.preventDefault();
       App.mintKudos(newKudo)
     });
 
+    // Click on Kudos image to get detail
+    $(document).on('click', '.card-img-top', function(event) {
+      $('#detailsModal').modal()
+      // Map the image attributes set in addKudosArtifact to the model elements
+      $('#staticDetailsKudosId').val($(this).attr('kudosId'))
+      $('#staticDetailsName').val($(this).attr('kudosName'))
+      $('#staticDetailsDescription').val($(this).attr('kudosDescription'))
+      $('#staticDetailsRarity').val($(this).attr('kudosRarity'))
+      $('#staticDetailsPrice').val($(this).attr('kudosPrice'))
+      $('#staticDetailsNumClonesAllowed').val($(this).attr('kudosNumClonesAllowed'))
+      $('#staticDetailsNumClonesInWild').val($(this).attr('kudosNumClonesInWild'))
+    })
+
+    // Clone button
     $(document).on('click', '.btn-clone', function(event) {
       event.preventDefault()
-      if($(this).hasClass('disabled')) {
-        return
-      }
+      // if($(this).hasClass('disabled')) {
+      //   return
+      // }
+      let name = $(this).attr('kudosName')
       $('#cloneModal').modal()
+      $('#staticName').val(name)
       $('#btnCloneModal').click(function(event) { 
         event.preventDefault()
         let numClones = parseInt($('#numClonesInput').val().trim(), 10)
-        App.cloneKudos(numClones)
+        App.cloneKudos(name, numClones)
       })
     })
 
+    // Transfer button
     $(document).on('click', '.btn-transfer', function(event) {
       event.preventDefault()
+      let kudosId = $(this).attr('kudosId')
       $('#transferModal').modal()
+      $('#staticTransferKudosId').val(kudosId)
       $('#btnTransferModal').click(function(event) { 
         event.preventDefault()
-        let address = $('#addressTransferInput').val().trim()
-        App.transferKudos(address)
+        let toAccount = $('#addressTransferInput').val().trim()
+        App.transferKudos(toAccount, parseInt(kudosId, 10))
       })
     })
 
+    // Burn button
     $(document).on('click', '.btn-burn', function(event) {
       event.preventDefault()
+      let kudosId = $(this).attr('kudosId')
       $('#burnModal').modal()
+      $('#staticBurnKudosId').val(kudosId)
       $('#btnBurnModal').click(function(event) { 
         event.preventDefault()
-        App.burnKudos()
+        App.burnKudos(parseInt(kudosId, 10))
       })
     })
 
@@ -118,13 +180,14 @@ App = {
         return kudosContractInstance.create(newKudo.name, newKudo.description, newKudo.rarity, newKudo.price, newKudo.numClonesAllowed, {from: account, value: new web3.BigNumber(1000000000000000)});
       }).then(function(result) {
         App.addKudosArtifact(null, [newKudo.name, newKudo.description, newKudo.rarity, newKudo.price, newKudo.numClonesAllowed])
+        $('#kudosModalBlank').modal('hide')
       }).catch(function(err) {
         console.log(err.message);
       });
     });
   },
 
-  cloneKudos: function(numClones) {
+  cloneKudos: function(name, numClones) {
 
     var kudosContractInstance;
 
@@ -136,7 +199,50 @@ App = {
       var account = accounts[0];
       App.contracts.KudosToken.deployed().then(function(instance) {
         kudosContractInstance = instance;
-        return kudosContractInstance.clone(newKudo.name, newKudo.description, newKudo.rarity, newKudo.price, newKudo.numClonesAllowed, {from: account, value: new web3.BigNumber(1000000000000000)});
+        return kudosContractInstance.clone(name, numClones, {from: account, value: new web3.BigNumber(1000000000000000)});
+      }).then(function(result) {
+        return true
+      }).catch(function(err) {
+        console.log(err.message);
+      });
+    });
+  },
+
+  transferKudos: function(toAccount, kudosId) {
+
+    var kudosContractInstance;
+
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
+      }
+
+      var account = accounts[0];
+      App.contracts.KudosToken.deployed().then(function(instance) {
+        kudosContractInstance = instance;
+        let fromAccount = account;
+        return kudosContractInstance.transferFrom(fromAccount, toAccount, kudosId);
+      }).then(function(result) {
+        return true
+      }).catch(function(err) {
+        console.log(err.message);
+      });
+    });
+  },
+
+  burnKudos: function(kudosId) {
+
+    var kudosContractInstance;
+
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
+      }
+
+      var account = accounts[0];
+      App.contracts.KudosToken.deployed().then(function(instance) {
+        kudosContractInstance = instance;
+        return kudosContractInstance.burn(account, kudosId);
       }).then(function(result) {
         return true
       }).catch(function(err) {
@@ -176,66 +282,85 @@ App = {
 
   addKudosArtifact: function (kudosId, kudos) {
 
-    let source = imageMapping[kudos[0]]
+    kudosObj = {
+      kudosId: kudosId,
+      kudosName: kudos[0],
+      kudosDescription: kudos[1],
+      kudosRarity: kudos[2],
+      kudosPrice: (kudos[3]/1000),
+      kudosNumClonesAllowed: kudos[4],
+      kudosNumClonesInWild: kudos[5]
+    }
+
+    let source = kudosMap[kudos[0]].image
     if(source == undefined) {
       source = 'https://robohash.org/' + kudos[0];
     }
 
     let cardElement = document.createElement('div')
-    $(cardElement).attr('class', 'card border-0 p-2').attr('style', 'width: 15rem;')
+    $(cardElement).attr('class', 'card border-0 p-2 text-center').attr('style', 'width: 15rem;')
 
     let cardImage = document.createElement('img')
     $(cardImage).attr('class', 'card-img-top').attr('src', source).attr('style', 'height: 194px;')
+    .attr(kudosObj)
 
     let cardBody = document.createElement('div')
     cardBody.setAttribute('class', 'card-body')
 
-    let cardButton1 = document.createElement('button')
-    $(cardButton1).attr('type', 'button').attr('data-toggle', 'modal').text('Clone')
+    let cardInfo = document.createElement('p')
+    cardInfo.setAttribute('class', 'card-text')
+    cardInfo.innerHTML = '<b>ID #:</b> ' + kudosId + '<br>' + '<b>Name:</b> ' + kudosMap[kudos[0]].name
+    $(cardBody).append(cardInfo)
 
     // Grey out the Clone button if numClonesAvailable == 0
-    if(kudos[4] == 0) {
-      $(cardButton1).attr('class', 'btn btn-sm btn-primary btn-block btn-clone disabled')
+    if(kudos[4] != 0) {
+      var cardButton1 = document.createElement('button')
+      $(cardButton1).attr('type', 'button').attr('data-toggle', 'modal').attr('kudosName', kudos[0])
+      .attr('class', 'btn btn-sm btn-primary btn-block btn-clone')
+      .text('Clone')
     } else {
-      $(cardButton1).attr('class', 'btn btn-sm btn-primary btn-block btn-clone')
+      var cardButton1 = document.createElement('p')
     }
 
 
     let cardButton2 = document.createElement('button')
     $(cardButton2).attr('type', 'button').attr('class', 'btn btn-sm btn-secondary btn-block btn-transfer').attr('data-toggle', 'modal')
+    .attr('kudosId', kudosId)
     .text('Transfer')
 
     let cardButton3 = document.createElement('button')
     $(cardButton3).attr('type', 'button').attr('class', 'btn btn-sm btn-danger btn-block btn-burn').attr('data-toggle', 'modal')
+    .attr('kudosId', kudosId)
     .text('Burn')
 
-    let cardList = document.createElement('ul')
-    cardList.setAttribute('class', 'list-group list-group-flush')
+    // let cardList = document.createElement('ul')
+    // cardList.setAttribute('class', 'list-group list-group-flush')
 
     // Build out the owned Kudos information
-    let cardListItemId = document.createElement('li')
-    cardListItemId.setAttribute('class', 'list-group-item')
-    cardListItemId.innerHTML = '<b>ID #</b>: ' + kudosId
+    // let cardListItemId = document.createElement('li')
+    // cardListItemId.setAttribute('class', 'list-group-item')
+    // cardListItemId.innerHTML = '<b>ID #</b>: ' + kudosId
 
-    let cardListItem0 = document.createElement('li')
-    cardListItem0.setAttribute('class', 'list-group-item')
-    cardListItem0.innerHTML = '<b>Name</b>: ' + kudos[0]
+    // let cardListItem0 = document.createElement('li')
+    // cardListItem0.setAttribute('class', 'list-group-item')
+    // cardListItem0.setAttribute('id', 'list-group-item')
+    // cardListItem0.innerHTML = '<b>Name</b>: ' + kudos[0]
 
-    let cardListItem1 = document.createElement('li')
-    cardListItem1.setAttribute('class', 'list-group-item')
-    cardListItem1.innerHTML = '<b>Description</b>: ' + kudos[1]
+    // let cardListItem1 = document.createElement('li')
+    // cardListItem1.setAttribute('class', 'list-group-item')
+    // cardListItem1.innerHTML = '<b>Description</b>: ' + kudos[1]
 
-    let cardListItem2 = document.createElement('li')
-    cardListItem2.setAttribute('class', 'list-group-item')
-    cardListItem2.innerHTML = '<b>Rarity</b>: ' + kudos[2].toString()
+    // let cardListItem2 = document.createElement('li')
+    // cardListItem2.setAttribute('class', 'list-group-item')
+    // cardListItem2.innerHTML = '<b>Rarity</b>: ' + kudos[2].toString()
 
-    let cardListItem3 = document.createElement('li')
-    cardListItem3.setAttribute('class', 'list-group-item')
-    cardListItem3.innerHTML = '<b>Price:</b> ' + (kudos[3]/1000).toString() + ' ETH'
+    // let cardListItem3 = document.createElement('li')
+    // cardListItem3.setAttribute('class', 'list-group-item')
+    // cardListItem3.innerHTML = '<b>Price:</b> ' + (kudos[3]/1000).toString() + ' ETH'
 
-    $(cardList).append(cardListItemId, cardListItem0, cardListItem1, cardListItem2, cardListItem3)
+    // $(cardList).append(cardListItemId, cardListItem0, cardListItem1, cardListItem2, cardListItem3)
     $(cardBody).append(cardButton1, cardButton2, cardButton3)
-    $(cardElement).append(cardImage, cardBody, cardList)
+    $(cardElement).append(cardImage, cardBody)
 
     $('#owner-kudos').append(cardElement)
   },

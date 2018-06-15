@@ -13,6 +13,63 @@
       <p class="lead">by Gitcoin</p>
     </div>
 
+    <!-- Details Modal -->
+    <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Kudos Details</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group row">
+                <label for="staticDetailsKudosId" class="col-sm-5 col-form-label">KudosID</label>
+                <div class="col-sm-5">
+                  <input type="text" readonly class="form-control-plaintext" id="staticDetailsKudosId" value="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="staticDetailsDescription" class="col-sm-5 col-form-label">Description</label>
+                <div class="col-sm-5">
+                  <input type="text" readonly class="form-control-plaintext" id="staticDetailsDescription" value="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="staticDetailsRarity" class="col-sm-5 col-form-label">Rarity</label>
+                <div class="col-sm-5">
+                  <input type="text" readonly class="form-control-plaintext" id="staticDetailsRarity" value="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="staticDetailsPrice" class="col-sm-5 col-form-label">Price</label>
+                <div class="col-sm-5">
+                  <input type="text" readonly class="form-control-plaintext" id="staticDetailsPrice" value="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="staticDetailsClonesAlowed" class="col-sm-5 col-form-label">Clones Allowed</label>
+                <div class="col-sm-5">
+                  <input type="text" readonly class="form-control-plaintext" id="staticDetailsNumClonesAllowed" value="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="staticDetailsClonesInWild" class="col-sm-5 col-form-label">Clones In Wild</label>
+                <div class="col-sm-5">
+                  <input type="text" readonly class="form-control-plaintext" id="staticDetailsNumClonesInWild" value="">
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Clone Modal -->
     <div class="modal fade" id="cloneModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
@@ -25,8 +82,14 @@
           </div>
           <div class="modal-body">
             <form>
+              <div class="form-group row">
+                <label for="staticDescription" class="col-sm-2 col-form-label">Name</label>
+                <div class="col-sm-10">
+                  <input type="text" readonly class="form-control-plaintext" id="staticName" value="">
+                </div>
+              </div>
               <div class="form-group">
-                <label for="descriptionInput">How many clones?</label>
+                <label for="numClonesInput">How many clones?</label>
                 <input type="text" class="form-control" id="numClonesInput" aria-describedby="emailHelp" value="1">
               </div>
             </form>
@@ -44,13 +107,19 @@
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">What address?</h5>
+            <h5 class="modal-title" id="exampleModalLongTitle">Transfer to?</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <form>
+              <div class="form-group row">
+                <label for="staticKudosId" class="col-sm-2 col-form-label">KudosID</label>
+                <div class="col-sm-10">
+                  <input type="text" readonly class="form-control-plaintext" id="staticTransferKudosId" value="">
+                </div>
+              </div>
               <div class="form-group">
                 <label for="descriptionInput">Address</label>
                 <input type="text" class="form-control" id="addressTransferInput" aria-describedby="emailHelp" placeholder="0x471a22367c00338939Aaaca7D4191AA3117175DF">
@@ -75,7 +144,16 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body">Are you sure?</div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group row">
+                <label for="staticKudosId" class="col-sm-2 col-form-label">KudosID</label>
+                <div class="col-sm-10">
+                  <input type="text" readonly class="form-control-plaintext" id="staticBurnKudosId" value="">
+                </div>
+              </div>
+            </form>
+          </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             <button type="button" class="btn btn-primary" id="btnBurnModal">Burn</button>
@@ -109,9 +187,11 @@
                   <option>meeseeks</option>
                 </select>
               </div>
-              <div class="form-group">
-                <label for="descriptionInput">Description</label>
-                <input type="text" class="form-control" id="descriptionInput" aria-describedby="emailHelp" placeholder="Enter description" value="Existence is pain!">
+              <div class="form-group row">
+                <label for="staticMintDescription" class="col-sm-5 col-form-label">Description</label>
+                <div class="col-sm-5">
+                  <input type="text" readonly class="form-control-plaintext" id="staticMintDescription" value="">
+                </div>
               </div>
               <div class="form-group">
                 <label for="formControlRange">Rarity</label>
@@ -198,7 +278,7 @@
 <!--           <img class="card-img-top" src="https://vignette.wikia.nocookie.net/uncyclopedia/images/a/a3/F-spot-question-mark.png/revision/latest?cb=20070121222858" alt="Card image cap" style="height: 194px;"> -->
           <div class="card-body">
             <p class="card-text"></p>
-            <button type="button" class="btn btn-primary btn-lg mint-button" data-toggle="modal" data-target="#kudosModalBlank">Mint Gen0</button>
+            <button type="button" class="btn btn-primary btn-lg mint-button" id=btnMintGen0>Mint Gen0</button>
           </div>
         </div>
       </div>
