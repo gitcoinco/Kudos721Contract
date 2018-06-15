@@ -3,8 +3,7 @@ pragma solidity ^0.4.24;
 import 'zeppelin-solidity/contracts/token/ERC721/ERC721Token.sol';
 import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
 
-contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
-
+contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable { 
     struct Kudo {
         string name;
         string description;
@@ -18,7 +17,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
 
     mapping(string => uint256) internal nameToTokenId;
 
-    function create(string name, string description, uint256 rareness, uint256 price, uint256 numClonesAllowed) public  {
+    function create(string name, string description, uint256 rareness, uint256 price, uint256 numClonesAllowed) public payable{
         require(nameToTokenId[name] == 0);
         uint256 _numClonesInWild = 0;
 
