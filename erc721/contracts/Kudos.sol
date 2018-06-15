@@ -47,6 +47,8 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         uint256 tokenId = kudos.push(_newKudo) - 1;
         _mint(msg.sender, tokenId);
 
+    function burn(address owner, uint256 tokenId) public payable{
+        _burn(owner, tokenId);
     }
 
     function getKudoById(uint256 tokenId) view public returns (string name, string description, uint256 rareness, uint256 price, uint256 numClonesAllowed, uint256 numClonesInWild) {
