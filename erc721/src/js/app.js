@@ -1,12 +1,13 @@
 // replace with IPFS hashes
 var imageMapping = {
-  'bugsquasher:': 'images/devflare-bugsquasher.svg',
+  'bugsquasher': 'images/devflare-bugsquasher.svg',
   'collaborationmachine': 'images/devflare-collaborationmachine.svg',
   'designstar': 'images/devflare-designstar.svg',
   'fastturnaround': 'images/devflare-fastturnaround.svg',
   'helpinghand': 'images/devflare-helpinghand.svg',
   'problemsolver': 'images/devflare-problemsolver.svg',
-  'pythonista': 'images/devflare-pythonista.svg'
+  'pythonista': 'images/devflare-pythonista.svg',
+  'meeseeks': 'images/meeseeks.jpg'
 }
 
 App = {
@@ -54,9 +55,6 @@ App = {
   },
 
   bindEvents: function() {
-    // $(document).on('click', '#mintColors', App.mintColors);
-    // $(document).on('click', '#color', App.generateNewColor);
-    // $(document).on('click', '#mint-modal', App.mintKudos)
     $('#mint-modal-blank').on('click', function(event) {
       let newKudo = {
         'name': $('#nameInput').val().trim(),
@@ -70,22 +68,44 @@ App = {
       event.preventDefault();
       App.mintKudos(newKudo)
     });
-    // $(document).on('click', '#mint-modal-blank', App.mintKudos)
-      // var kudosName = $(this).data('name');
-      // var kudosDescription = $(this).data('description');
-      // $(".kudosModel #staticName").val('from jquery');
-     // As pointed out in comments, 
-     // it is superfluous to have to manually call the modal.
-     // $('#addBookDialog').modal('show');
-  },
 
-  // generateNewColor: function(event) { 
-  //   document.getElementById('color').setAttribute('style', 'background-color: ' + App.getRandomColor())
-  // },
+    $(document).on('click', '.btn-clone', function(event) {
+      event.preventDefault()
+      if($(this).hasClass('disabled')) {
+        return
+      }
+      $('#cloneModal').modal()
+      $('#btnCloneModal').click(function(event) { 
+        event.preventDefault()
+        let numClones = parseInt($('#numClonesInput').val().trim(), 10)
+        App.cloneKudos(numClones)
+      })
+    })
+
+    $(document).on('click', '.btn-transfer', function(event) {
+      event.preventDefault()
+      $('#transferModal').modal()
+      $('#btnTransferModal').click(function(event) { 
+        event.preventDefault()
+        let address = $('#addressTransferInput').val().trim()
+        App.transferKudos(address)
+      })
+    })
+
+    $(document).on('click', '.btn-burn', function(event) {
+      event.preventDefault()
+      $('#burnModal').modal()
+      $('#btnBurnModal').click(function(event) { 
+        event.preventDefault()
+        App.burnKudos()
+      })
+    })
+
+  },
 
   mintKudos: function(newKudo) {
 
-    var KudosContractInstance;
+    var kudosContractInstance;
 
     web3.eth.getAccounts(function(error, accounts) {
       if (error) {
@@ -96,6 +116,27 @@ App = {
       App.contracts.KudosToken.deployed().then(function(instance) {
         kudosContractInstance = instance;
         return kudosContractInstance.create(newKudo.name, newKudo.description, newKudo.rarity, newKudo.price, newKudo.numClonesAllowed, {from: account, value: new web3.BigNumber(1000000000000000)});
+      }).then(function(result) {
+        App.addKudosArtifact(null, [newKudo.name, newKudo.description, newKudo.rarity, newKudo.price, newKudo.numClonesAllowed])
+      }).catch(function(err) {
+        console.log(err.message);
+      });
+    });
+  },
+
+  cloneKudos: function(numClones) {
+
+    var kudosContractInstance;
+
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
+      }
+
+      var account = accounts[0];
+      App.contracts.KudosToken.deployed().then(function(instance) {
+        kudosContractInstance = instance;
+        return kudosContractInstance.clone(newKudo.name, newKudo.description, newKudo.rarity, newKudo.price, newKudo.numClonesAllowed, {from: account, value: new web3.BigNumber(1000000000000000)});
       }).then(function(result) {
         return true
       }).catch(function(err) {
@@ -136,44 +177,69 @@ App = {
   addKudosArtifact: function (kudosId, kudos) {
 
     let source = imageMapping[kudos[0]]
-    console.log(source)
     if(source == undefined) {
       source = 'https://robohash.org/' + kudos[0];
     }
-    console.log(source);
 
     let cardElement = document.createElement('div')
-    cardElement.setAttribute('class', 'card')
-    cardElement.setAttribute('style', 'width: 10rem;')
+    $(cardElement).attr('class', 'card border-0 p-2').attr('style', 'width: 15rem;')
 
     let cardImage = document.createElement('img')
-    cardImage.setAttribute('class', 'card-img-top')
-    cardImage.setAttribute('src', source)
-    cardImage.setAttribute('class', 'card-img-top')
+    $(cardImage).attr('class', 'card-img-top').attr('src', source).attr('style', 'height: 194px;')
 
     let cardBody = document.createElement('div')
     cardBody.setAttribute('class', 'card-body')
 
-    let cardText = document.createElement('p')
-    cardText.setAttribute('class', 'card-text')
-    cardText.innerHTML = '# ' + kudosId.toString() + '<br>' + kudos[0]
+    let cardButton1 = document.createElement('button')
+    $(cardButton1).attr('type', 'button').attr('data-toggle', 'modal').text('Clone')
 
-    cardBody.appendChild(cardText)
-    cardElement.appendChild(cardImage)
-    cardElement.appendChild(cardBody)
+    // Grey out the Clone button if numClonesAvailable == 0
+    if(kudos[4] == 0) {
+      $(cardButton1).attr('class', 'btn btn-sm btn-primary btn-block btn-clone disabled')
+    } else {
+      $(cardButton1).attr('class', 'btn btn-sm btn-primary btn-block btn-clone')
+    }
 
-    document.querySelector('#owner-kudos').append(cardElement)
+
+    let cardButton2 = document.createElement('button')
+    $(cardButton2).attr('type', 'button').attr('class', 'btn btn-sm btn-secondary btn-block btn-transfer').attr('data-toggle', 'modal')
+    .text('Transfer')
+
+    let cardButton3 = document.createElement('button')
+    $(cardButton3).attr('type', 'button').attr('class', 'btn btn-sm btn-danger btn-block btn-burn').attr('data-toggle', 'modal')
+    .text('Burn')
+
+    let cardList = document.createElement('ul')
+    cardList.setAttribute('class', 'list-group list-group-flush')
+
+    // Build out the owned Kudos information
+    let cardListItemId = document.createElement('li')
+    cardListItemId.setAttribute('class', 'list-group-item')
+    cardListItemId.innerHTML = '<b>ID #</b>: ' + kudosId
+
+    let cardListItem0 = document.createElement('li')
+    cardListItem0.setAttribute('class', 'list-group-item')
+    cardListItem0.innerHTML = '<b>Name</b>: ' + kudos[0]
+
+    let cardListItem1 = document.createElement('li')
+    cardListItem1.setAttribute('class', 'list-group-item')
+    cardListItem1.innerHTML = '<b>Description</b>: ' + kudos[1]
+
+    let cardListItem2 = document.createElement('li')
+    cardListItem2.setAttribute('class', 'list-group-item')
+    cardListItem2.innerHTML = '<b>Rarity</b>: ' + kudos[2].toString()
+
+    let cardListItem3 = document.createElement('li')
+    cardListItem3.setAttribute('class', 'list-group-item')
+    cardListItem3.innerHTML = '<b>Price:</b> ' + (kudos[3]/1000).toString() + ' ETH'
+
+    $(cardList).append(cardListItemId, cardListItem0, cardListItem1, cardListItem2, cardListItem3)
+    $(cardBody).append(cardButton1, cardButton2, cardButton3)
+    $(cardElement).append(cardImage, cardBody, cardList)
+
+    $('#owner-kudos').append(cardElement)
   },
 
-  // getRandomColor: function() {
-  //   var letters = '0123456789ABCDEF';
-  //   let color = "";
-  //   for (var i = 0; i < 6; i++) {
-  //     color += letters[Math.floor(Math.random() * 16)];
-  //   }
-  //   App.currentColor = color;
-  //   return "#" + color;
-  // }
 };
 
 $(function() {

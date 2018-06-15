@@ -60,11 +60,11 @@ pythonista = dict(name='pythonista',
 
 artifacts = (bugsquasher, collabmachine, designstar, fastturn, helpinghand, problemsolver, pythonista)
 
-for artifact in artifacts:
-    try:
-        kudos.functions.create(**artifact).transact({'from': w3.eth.coinbase})
-    except ValueError as e:
-        print(f'{artifact["name"]} artifact already exists.  Skipping creation.')
+# for artifact in artifacts:
+#     try:
+#         kudos.functions.create(**artifact).transact({'from': w3.eth.coinbase})
+#     except ValueError as e:
+#         print(f'{artifact["name"]} artifact already exists.  Skipping creation.')
 
 
 print(kudos.functions.totalSupply().call())

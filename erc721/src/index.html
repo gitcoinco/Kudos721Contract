@@ -13,48 +13,72 @@
       <p class="lead">by Gitcoin</p>
     </div>
 
-    <!--  Kudos Modal -->
-    <div class="modal fade" id="kudosModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <!-- Clone Modal -->
+    <div class="modal fade" id="cloneModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">Design your Kudos</h5>
+            <h5 class="modal-title" id="exampleModalLongTitle">Clone</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <form>
-              <div class="form-group row">
-                <label for="staticName" class="col-sm-4 col-form-label">Name</label>
-                <div class="col-sm-8">
-                  <input type="text" readonly class="form-control-plaintext" id="staticName" value="Some name">
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="staticDescription" class="col-sm-4 col-form-label">Description</label>
-                <div class="col-sm-8">
-                  <input type="text" readonly class="form-control-plaintext" id="staticDescription" value="Some description">
-                </div>
-              </div>
               <div class="form-group">
-                <label for="formControlRange">Rarity</label>
-                <input type="range" class="form-control-range" id="formControlRange">
-                <small id="rarityHelp" class="form-text text-muted">0 (not rare) to 100 (very rare)</small>
+                <label for="descriptionInput">How many clones?</label>
+                <input type="text" class="form-control" id="numClonesInput" aria-describedby="emailHelp" value="1">
               </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Exit</button>
+            <button type="button" class="btn btn-primary" id="btnCloneModal">Clone</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transfer Modal -->
+    <div class="modal fade" id="transferModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">What address?</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
               <div class="form-group">
-                <label for="priceInput">Price</label>
-                <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter price in ETH">
-              </div>
-              <div class="form-group">
-                <label for="numClonesInput">Number of clones allowed</label>
-                <input type="text" class="form-control" id="numClonesInput" aria-describedby="emailHelp" placeholder="Enter number">
+                <label for="descriptionInput">Address</label>
+                <input type="text" class="form-control" id="addressTransferInput" aria-describedby="emailHelp" placeholder="0x471a22367c00338939Aaaca7D4191AA3117175DF">
               </div>
             </form>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" id="mint-modal">Mint</button>
+            <button type="button" class="btn btn-primary" id="btnTransferModal">Transfer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Burn Modal -->
+    <div class="modal fade" id="burnModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Burn Kudos</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">Are you sure?</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="btnBurnModal">Burn</button>
           </div>
         </div>
       </div>
@@ -74,7 +98,16 @@
             <form>
               <div class="form-group">
                 <label for="nameInput">Name</label>
-                <input type="text" class="form-control" id="nameInput" aria-describedby="emailHelp" placeholder="Enter name" value="Meeseeks">
+                <select class="form-control" id="nameInput">
+                  <option>bugsquasher</option>
+                  <option>collaborationmachine</option>
+                  <option>designstar</option>
+                  <option>fastturnaround</option>
+                  <option>helpinghand</option>
+                  <option>problemsolver</option>
+                  <option>pythonista</option>
+                  <option>meeseeks</option>
+                </select>
               </div>
               <div class="form-group">
                 <label for="descriptionInput">Description</label>
@@ -104,11 +137,10 @@
     </div>
 
     <!-- Available Kudos in marketplace -->
-    <div class="container have-some-margin" align="center">
-      <h4>Choose a Kudos to mint!</h4>
-      <div class="container m-5"></div>
-
-      <!-- 4 kudos per row -->
+    <div class="container" align="center">
+      <!-- <h4>Choose a Kudos to mint!</h4> -->
+      <!-- <div class="container m-5"></div> -->
+<!-- 
       <div class="row justify-content-center">
         <div class="card border-0 p-2" style="width: 15rem;">
           <img class="card-img-top" src="images/devflare-bugsquasher.svg" alt="Card image cap">
@@ -140,7 +172,6 @@
         </div>
       </div>
 
-      <!-- 4 kudos per row -->
       <div class="row justify-content-center">
         <div class="card border-0 p-2" style="width: 15rem;">
           <img class="card-img-top" src="images/devflare-helpinghand.svg" alt="Card image cap">
@@ -162,12 +193,12 @@
             <p class="card-text">Pythonista</p>
             <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
           </div>
-        </div>
+        </div> -->
         <div class="card border-0 p-2" style="width: 15rem;">
-          <img class="card-img-top" src="https://vignette.wikia.nocookie.net/uncyclopedia/images/a/a3/F-spot-question-mark.png/revision/latest?cb=20070121222858" alt="Card image cap">
+<!--           <img class="card-img-top" src="https://vignette.wikia.nocookie.net/uncyclopedia/images/a/a3/F-spot-question-mark.png/revision/latest?cb=20070121222858" alt="Card image cap" style="height: 194px;"> -->
           <div class="card-body">
-            <p class="card-text">Make your own</p>
-            <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModalBlank">Mint</button>
+            <p class="card-text"></p>
+            <button type="button" class="btn btn-primary btn-lg mint-button" data-toggle="modal" data-target="#kudosModalBlank">Mint Gen0</button>
           </div>
         </div>
       </div>
