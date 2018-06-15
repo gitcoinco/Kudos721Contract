@@ -9,42 +9,42 @@ checksummed = Web3.toChecksumAddress('0x0aacb7c96b002d3939ed5ceb7e079d79227e210d
 
 kudos = w3.eth.contract(address=checksummed, abi=abi)
 
-bugsquasher = dict(name='bug_squasher',
+bugsquasher = dict(name='bugsquasher',
                    description='exterminator',
                    rareness=1234,
                    price=50000,
                    numClonesAllowed=3
                    )
 
-collabmachine = dict(name='collaboration_machine',
+collabmachine = dict(name='collaborationmachine',
                      description='plays nice with others',
                      rareness=1234,
                      price=50000,
                      numClonesAllowed=3
                      )
 
-designstar = dict(name='design_star',
+designstar = dict(name='designstar',
                   description='makes nice things',
                   rareness=1234,
                   price=50000,
                   numClonesAllowed=3
                   )
 
-fastturn = dict(name='fast_turnaround',
+fastturn = dict(name='fastturnaround',
                 description='speedy gonzalez',
                 rareness=1234,
                 price=50000,
                 numClonesAllowed=3
                 )
 
-helpinghand = dict(name='helping_hand',
+helpinghand = dict(name='helpinghand',
                    description='like a good neighbor',
                    rareness=1234,
                    price=50000,
                    numClonesAllowed=3
                    )
 
-problemsolver = dict(name='problem_solver',
+problemsolver = dict(name='problemsolver',
                      description='exterminator',
                      rareness=1234,
                      price=50000,

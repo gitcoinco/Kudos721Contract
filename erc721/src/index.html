@@ -13,7 +13,7 @@
       <p class="lead">by Gitcoin</p>
     </div>
 
-    <!-- Modal -->
+    <!--  Kudos Modal -->
     <div class="modal fade" id="kudosModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -40,7 +40,7 @@
               <div class="form-group">
                 <label for="formControlRange">Rarity</label>
                 <input type="range" class="form-control-range" id="formControlRange">
-                <small id="rarityHelp" class="form-text text-muted">lowest to highest</small>
+                <small id="rarityHelp" class="form-text text-muted">0 (not rare) to 100 (very rare)</small>
               </div>
               <div class="form-group">
                 <label for="priceInput">Price</label>
@@ -54,7 +54,50 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Mint</button>
+            <button type="button" class="btn btn-primary" id="mint-modal">Mint</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kudos Modal Blank -->
+    <div class="modal fade" id="kudosModalBlank" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Design your Kudos</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <label for="nameInput">Name</label>
+                <input type="text" class="form-control" id="nameInput" aria-describedby="emailHelp" placeholder="Enter name" value="Meeseeks">
+              </div>
+              <div class="form-group">
+                <label for="descriptionInput">Description</label>
+                <input type="text" class="form-control" id="descriptionInput" aria-describedby="emailHelp" placeholder="Enter description" value="Existence is pain!">
+              </div>
+              <div class="form-group">
+                <label for="formControlRange">Rarity</label>
+                <input type="range" class="form-control-range" id="rarityInput">
+                <small id="rarityHelp" class="form-text text-muted">0 to 100</small>
+              </div>
+              <div class="form-group">
+                <label for="priceInput">Price</label>
+                <input type="text" class="form-control" id="priceInput" aria-describedby="emailHelp" placeholder="Enter price in ETH" value=".1">
+              </div>
+              <div class="form-group">
+                <label for="numClonesInput">Number of clones allowed</label>
+                <input type="text" class="form-control" id="numClonesAllowedInput" aria-describedby="emailHelp" placeholder="Enter number" value="10">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="mint-modal-blank">Mint</button>
           </div>
         </div>
       </div>
@@ -63,32 +106,33 @@
     <!-- Available Kudos in marketplace -->
     <div class="container have-some-margin" align="center">
       <h4>Choose a Kudos to mint!</h4>
+      <div class="container m-5"></div>
 
       <!-- 4 kudos per row -->
       <div class="row justify-content-center">
-        <div class="card" style="width: 15rem;">
-          <img class="card-img-top" src="https://robohash.org/bug_squasher" alt="Card image cap">
+        <div class="card border-0 p-2" style="width: 15rem;">
+          <img class="card-img-top" src="images/devflare-bugsquasher.svg" alt="Card image cap">
           <div class="card-body">
             <p class="card-text">Bug Squasher</p>
             <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
           </div>
         </div>
-        <div class="card" style="width: 15rem;">
-          <img class="card-img-top" src="https://robohash.org/collaboration_machine" alt="Card image cap">
+        <div class="card border-0 p-2" style="width: 15rem;">
+          <img class="card-img-top" src="images/devflare-collaborationmachine.svg" alt="Card image cap">
           <div class="card-body">
             <p class="card-text">Collaboration Machine</p>
             <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
           </div>
         </div>
-        <div class="card" style="width: 15rem;">
-          <img class="card-img-top" src="https://robohash.org/design_star" alt="Card image cap">
+        <div class="card border-0 p-2" style="width: 15rem;">
+          <img class="card-img-top" src="images/devflare-designstar.svg" alt="Card image cap">
           <div class="card-body">
             <p class="card-text">Design Star</p>
             <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
           </div>
         </div>
-        <div class="card" style="width: 15rem;">
-          <img class="card-img-top" src="https://robohash.org/fast_turnaround" alt="Card image cap">
+        <div class="card border-0 p-2" style="width: 15rem;">
+          <img class="card-img-top" src="images/devflare-fastturnaround.svg" alt="Card image cap">
           <div class="card-body">
             <p class="card-text">Fast Turn Around</p>
             <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
@@ -98,32 +142,32 @@
 
       <!-- 4 kudos per row -->
       <div class="row justify-content-center">
-        <div class="card" style="width: 15rem;">
-          <img class="card-img-top" src="https://robohash.org/helping_hand" alt="Card image cap">
+        <div class="card border-0 p-2" style="width: 15rem;">
+          <img class="card-img-top" src="images/devflare-helpinghand.svg" alt="Card image cap">
           <div class="card-body">
             <p class="card-text">Helping Hand</p>
             <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
           </div>
         </div>
-        <div class="card" style="width: 15rem;">
-          <img class="card-img-top" src="https://robohash.org/problem_solver" alt="Card image cap">
+        <div class="card border-0 p-2" style="width: 15rem;">
+          <img class="card-img-top" src="images/devflare-problemsolver.svg" alt="Card image cap">
           <div class="card-body">
             <p class="card-text">Problem Solver</p>
             <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
           </div>
         </div>
-        <div class="card" style="width: 15rem;">
-          <img class="card-img-top" src="https://robohash.org/pythonista" alt="Card image cap">
+        <div class="card border-0 p-2" style="width: 15rem;">
+          <img class="card-img-top" src="images/devflare-pythonista.svg" alt="Card image cap">
           <div class="card-body">
             <p class="card-text">Pythonista</p>
             <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
           </div>
         </div>
-        <div class="card" style="width: 15rem;">
+        <div class="card border-0 p-2" style="width: 15rem;">
           <img class="card-img-top" src="https://vignette.wikia.nocookie.net/uncyclopedia/images/a/a3/F-spot-question-mark.png/revision/latest?cb=20070121222858" alt="Card image cap">
           <div class="card-body">
             <p class="card-text">Make your own</p>
-            <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModal">Mint</button>
+            <button type="button" class="btn btn-primary mint-button" data-toggle="modal" data-target="#kudosModalBlank">Mint</button>
           </div>
         </div>
       </div>
