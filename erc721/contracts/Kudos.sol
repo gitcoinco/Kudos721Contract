@@ -17,7 +17,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
 
     mapping(string => uint256) internal nameToTokenId;
 
-    function create(string name, string description, uint256 rareness, uint256 price, uint256 numClonesAllowed) public payable{
+    function create(string name, string description, uint256 rareness, uint256 price, uint256 numClonesAllowed) public payable {
         require(nameToTokenId[name] == 0);
         uint256 _numClonesInWild = 0;
 
@@ -29,23 +29,27 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         nameToTokenId[name] = tokenId;
     }
 
-    function clone(string name) public {
+    function clone(string name, uint256 numClonesRequested) public payable {
         // Grab existing Kudo blueprint
         Kudo memory _kudo = kudos[nameToTokenId[name]];
-        require(_kudo.numClonesInWild < _kudo.numClonesAllowed);
+        require(_kudo.numClonesInWild + numClonesRequested <= _kudo.numClonesAllowed);
 
         // Update original kudo struct in the array
-        _kudo.numClonesInWild += 1;
+        _kudo.numClonesInWild += numClonesRequested;
         kudos[nameToTokenId[name]] = _kudo;
 
         // Create new kudo, don't let it be cloned
-        Kudo memory _newKudo = _kudo;
-        _newKudo.numClonesAllowed = 0;
-        _newKudo.numClonesInWild = _kudo.numClonesInWild;
+        for (uint i = 0; i < numClonesRequested; i++) {
+            Kudo memory _newKudo = _kudo;
+            _newKudo.numClonesAllowed = 0;
+            _newKudo.numClonesInWild = _kudo.numClonesInWild;
 
-        // The new kudo is pushed onto the array and minted
-        uint256 tokenId = kudos.push(_newKudo) - 1;
-        _mint(msg.sender, tokenId);
+            // The new kudo is pushed onto the array and minted
+            uint256 tokenId = kudos.push(_newKudo) - 1;
+            _mint(msg.sender, tokenId);
+        }
+
+    }
 
     function burn(address owner, uint256 tokenId) public payable{
         _burn(owner, tokenId);
