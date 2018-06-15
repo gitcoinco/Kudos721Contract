@@ -333,32 +333,6 @@ App = {
     .attr('kudosId', kudosId)
     .text('Burn')
 
-    // let cardList = document.createElement('ul')
-    // cardList.setAttribute('class', 'list-group list-group-flush')
-
-    // Build out the owned Kudos information
-    // let cardListItemId = document.createElement('li')
-    // cardListItemId.setAttribute('class', 'list-group-item')
-    // cardListItemId.innerHTML = '<b>ID #</b>: ' + kudosId
-
-    // let cardListItem0 = document.createElement('li')
-    // cardListItem0.setAttribute('class', 'list-group-item')
-    // cardListItem0.setAttribute('id', 'list-group-item')
-    // cardListItem0.innerHTML = '<b>Name</b>: ' + kudos[0]
-
-    // let cardListItem1 = document.createElement('li')
-    // cardListItem1.setAttribute('class', 'list-group-item')
-    // cardListItem1.innerHTML = '<b>Description</b>: ' + kudos[1]
-
-    // let cardListItem2 = document.createElement('li')
-    // cardListItem2.setAttribute('class', 'list-group-item')
-    // cardListItem2.innerHTML = '<b>Rarity</b>: ' + kudos[2].toString()
-
-    // let cardListItem3 = document.createElement('li')
-    // cardListItem3.setAttribute('class', 'list-group-item')
-    // cardListItem3.innerHTML = '<b>Price:</b> ' + (kudos[3]/1000).toString() + ' ETH'
-
-    // $(cardList).append(cardListItemId, cardListItem0, cardListItem1, cardListItem2, cardListItem3)
     $(cardBody).append(cardButton1, cardButton2, cardButton3)
     $(cardElement).append(cardImage, cardBody)
 
