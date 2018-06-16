@@ -8,10 +8,10 @@
   </head>
   <body>
 
-    <div class="container" align="center">
+<!--     <div class="container" align="center">
       <h1 class="display-2">Kudos</h1>
       <p class="lead">by Gitcoin</p>
-    </div>
+    </div> -->
 
     <!-- Details Modal -->
     <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -83,9 +83,21 @@
           <div class="modal-body">
             <form>
               <div class="form-group row">
-                <label for="staticDescription" class="col-sm-2 col-form-label">Name</label>
-                <div class="col-sm-10">
+                <label for="staticDescription" class="col-sm-5 col-form-label">Name</label>
+                <div class="col-sm-5">
                   <input type="text" readonly class="form-control-plaintext" id="staticName" value="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="staticClonesAllowed" class="col-sm-5 col-form-label">Clones allowed</label>
+                <div class="col-sm-5">
+                  <input type="text" readonly class="form-control-plaintext" id="staticClonesAllowed" value="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="staticClonesInWild" class="col-sm-5 col-form-label">Clones in wild</label>
+                <div class="col-sm-5">
+                  <input type="text" readonly class="form-control-plaintext" id="staticClonesInWild" value="">
                 </div>
               </div>
               <div class="form-group">
@@ -221,14 +233,14 @@
         <div class="card border-0 p-2" style="width: 15rem;">
           <div class="card-body">
             <p class="card-text"></p>
-            <button type="button" class="btn btn-primary btn-lg mint-button" id=btnMintGen0>Mint Gen0</button>
+            <button type="button" class="btn btn-success btn-lg mint-button" id=btnMintGen0>Mint Gen0</button>
           </div>
         </div>
       </div>
 
     </div>
 
-    <div class="container have-some-margin" align="center">
+    <div class="container" align="center">
       <h1 class="display-2">Your Kudos</h1>
     </div>
 

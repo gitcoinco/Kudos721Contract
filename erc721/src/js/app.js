@@ -128,9 +128,17 @@ App = {
       // if($(this).hasClass('disabled')) {
       //   return
       // }
+
+      // Error out if no clones are left
+      // if ( $('.card-img-top').attr('kudosNumClonesInWild') >= $('.card-img-top').attr('kudosNumClonesAllowed') ) {
+      //   alert('No more clones left!')
+      //   return
+      // }
       let name = $(this).attr('kudosName')
       $('#cloneModal').modal()
       $('#staticName').val(name)
+      $('#staticClonesAllowed').val($(this).attr('kudosNumClonesAllowed'))
+      $('#staticClonesInWild').val($(this).attr('kudosNumClonesinWild'))
       $('#btnCloneModal').click(function(event) { 
         event.preventDefault()
         let numClones = parseInt($('#numClonesInput').val().trim(), 10)
@@ -180,7 +188,7 @@ App = {
         return kudosContractInstance.create(newKudo.name, newKudo.description, newKudo.rarity, newKudo.price, newKudo.numClonesAllowed, {from: account, value: new web3.BigNumber(1000000000000000)});
       }).then(function(result) {
         App.addKudosArtifact(null, [newKudo.name, newKudo.description, newKudo.rarity, newKudo.price, newKudo.numClonesAllowed])
-        $('#kudosModalBlank').modal('hide')
+        $('.modal').modal('hide')
       }).catch(function(err) {
         console.log(err.message);
       });
@@ -201,7 +209,7 @@ App = {
         kudosContractInstance = instance;
         return kudosContractInstance.clone(name, numClones, {from: account, value: new web3.BigNumber(1000000000000000)});
       }).then(function(result) {
-        return true
+        $('.modal').modal('hide')
       }).catch(function(err) {
         console.log(err.message);
       });
@@ -223,7 +231,7 @@ App = {
         let fromAccount = account;
         return kudosContractInstance.transferFrom(fromAccount, toAccount, kudosId);
       }).then(function(result) {
-        return true
+        $('.modal').modal('hide')
       }).catch(function(err) {
         console.log(err.message);
       });
@@ -265,7 +273,8 @@ App = {
         kudosContractInstance = instance;
         return kudosContractInstance.balanceOf(account)
       }).then((result) => { 
-        const balance = parseInt(result);
+        let balance = parseInt(result);
+        console.log('account: ' + account)
         console.log('kudos balance:' + balance);
         for (let index = 0; index < balance; index++) {
           kudosContractInstance.tokenOfOwnerByIndex(account, index).then((kudosId) => {
@@ -298,14 +307,14 @@ App = {
     }
 
     let cardElement = document.createElement('div')
-    $(cardElement).attr('class', 'card border-0 p-2 text-center').attr('style', 'width: 15rem;')
+    $(cardElement).attr('class', 'card border-0 p-2 text-center').attr('style', 'width: 10rem;')
 
     let cardImage = document.createElement('img')
-    $(cardImage).attr('class', 'card-img-top').attr('src', source).attr('style', 'height: 194px;')
+    $(cardImage).attr('class', 'card-img-top').attr('src', source).attr('style', 'height: 150px;')
     .attr(kudosObj)
 
     let cardBody = document.createElement('div')
-    cardBody.setAttribute('class', 'card-body')
+    cardBody.setAttribute('class', 'card-body p-0')
 
     let cardInfo = document.createElement('p')
     cardInfo.setAttribute('class', 'card-text')
@@ -315,10 +324,17 @@ App = {
     // Grey out the Clone button if numClonesAvailable == 0
     if(kudos[4] != 0) {
       var cardButton1 = document.createElement('button')
-      $(cardButton1).attr('type', 'button').attr('data-toggle', 'modal').attr('kudosName', kudos[0])
+      $(cardButton1).attr('type', 'button').attr('data-toggle', 'modal')
       .attr('class', 'btn btn-sm btn-primary btn-block btn-clone')
+      .attr(kudosObj)
       .text('Clone')
-    } else {
+    } 
+    // else if (kudosObj.kudosNumClonesInWild >= kudosObj.kudosNumClonesAllowed ) {
+    //   $(cardButton1).attr('type', 'button').attr('data-toggle', 'modal').attr('kudosName', kudos[0])
+    //   .attr('class', 'btn btn-sm btn-primary btn-block btn-clone').attr('disabled')
+    //   .text('Clone')
+    // } 
+    else {
       var cardButton1 = document.createElement('p')
     }
 
@@ -333,7 +349,9 @@ App = {
     .attr('kudosId', kudosId)
     .text('Burn')
 
-    $(cardBody).append(cardButton1, cardButton2, cardButton3)
+    $(cardBody).append(cardButton2, cardButton1, 
+      // cardButton3
+      )
     $(cardElement).append(cardImage, cardBody)
 
     $('#owner-kudos').append(cardElement)
