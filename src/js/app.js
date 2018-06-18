@@ -1,47 +1,9 @@
 // replace with IPFS hashes
 
-const kudosMap = {
-  bugsquasher: {
-    name: 'Bug Squasher',
-    description: 'The bug terminator',
-    image: 'images/devflare-bugsquasher.svg'
-  },
-  collaborationmachine: {
-    name: 'Collaboration Machine',
-    description: 'Plays nice with others',
-    image: 'images/devflare-collaborationmachine.svg'
-  },
-  designstar: {
-    name: 'Design Star',
-    description: 'Just so good looking',
-    image: 'images/devflare-designstar.svg'
-  },
-  fastturnaround: {
-    name: 'Fast Turnaround',
-    description: 'Speedy Gonzalez',
-    image: 'images/devflare-fastturnaround.svg'
-  },
-  helpinghand: {
-    name: 'Helping Hand',
-    description: 'Like a good neighbor',
-    image: 'images/devflare-helpinghand.svg'
-  },
-  problemsolver: {
-    name: 'Problem Solver',
-    description: 'Nothing is impossible',
-    image: 'images/devflare-problemsolver.svg'
-  },
-  pythonista: {
-    name: 'Pythonista',
-    description: 'Zen-like',
-    image: 'images/devflare-pythonista.svg'
-  },
-  meeseeks: {
-    name: 'Mr. Meeseeks',
-    description: 'Existence is pain!',
-    image: 'images/meeseeks.jpg'
-  },
-}
+$.getJSON('kudosArtifacts.json', function(data) {
+  const kudosMap = data;
+  console.log(kudosMap)
+})
 
 App = {
   web3Provider: null,
