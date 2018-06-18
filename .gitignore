@@ -7,3 +7,4 @@ build/
 # mac files
 .DS_Store
 
+secrets.json
