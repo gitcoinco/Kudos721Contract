@@ -1,9 +1,8 @@
-# gitcoin-erc721
-
 ## Quickstart
 
 To run the blockchain and app locally:
 
+- `cd erc721`.
 - `npm install` to install npm requirements.
 - `npm install -g truffle ganache-cli` to install Truffle and Ganache-cli.
 - In a separate window, run `ganache-cli`.  It should now be running locally on port 8545.
