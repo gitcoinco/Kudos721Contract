@@ -1,6 +1,7 @@
 {
   "name": "erc721",
   "version": "1.0.0",
+  "repository": "https://github.com/mbeacom/gitcoin-erc721",
   "main": "truffle-config.js",
   "directories": {
     "test": "test"
