@@ -14,12 +14,10 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "truffle-hdwallet-provider": "0.0.5",
     "zeppelin-solidity": "^1.10.0",
-    "lite-server": "^2.3.0"
-  },
-  "devDependencies": {
     "lite-server": "^2.3.0"
   },
   "description": "Kudos App",
