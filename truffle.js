@@ -28,7 +28,9 @@ module.exports = {
       // from - default address to use for any transaction Truffle makes during migrations
     },
     ropsten: {
-      provider: new HDWalletProvider(mnemonic, 'https://ropsten.infura.io/' + token),
+      provider: function() {
+        return new HDWalletProvider(mnemonic, 'https://ropsten.infura.io/' + token)
+      },
       network_id: 3
     },
     development: {
