@@ -18,7 +18,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
     mapping(string => uint256) internal nameToTokenId;
 
     function create(string name, string description, uint256 rareness, uint256 price, uint256 numClonesAllowed) public payable {
-        require(nameToTokenId[name] == 0);
+        // require(nameToTokenId[name] == 0);
         uint256 _numClonesInWild = 0;
 
         Kudo memory _kudo = Kudo({name: name, description: description, rareness: rareness, price: price, numClonesAllowed: numClonesAllowed, numClonesInWild: _numClonesInWild});

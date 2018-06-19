@@ -83,7 +83,7 @@ App = {
       var KudosTokenArtifact = data;
       // TrufleContract is for local development only
       // App.contracts.KudosToken = TruffleContract(KudosTokenArtifact);
-      contractId = '0x84eed760d7b7b54823a7737ce6c5f0a31e840d43'
+      contractId = '0xdecc1b8882276a3c55de0443f2ecbb251ca0f947'
       App.contracts.KudosToken = web3.eth.contract(KudosTokenArtifact.abi).at(contractId)
       $('#ropstenMsg').append('<a id=contractLink>Token Information</a')
       $('#contractLink').attr('href', 'https://ropsten.etherscan.io/token/' + contractId)
