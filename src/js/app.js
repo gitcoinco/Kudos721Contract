@@ -2,7 +2,7 @@
 
 $.getJSON('kudosArtifacts.json', function(data) {
   kudosMap = data;
-})
+});
 
 /**
  * Looks for a transaction receipt.  If it doesn't find one, it keeps running until it does.
