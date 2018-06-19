@@ -1,9 +1,38 @@
 // replace with IPFS hashes
 
 $.getJSON('kudosArtifacts.json', function(data) {
-  const kudosMap = data;
-  console.log(kudosMap)
+  kudosMap = data;
 })
+
+/**
+ * Looks for a transaction receipt.  If it doesn't find one, it keeps running until it does.
+ * @callback
+ * @param {string} txhash - The transaction hash.
+ * @param {function} f - The function passed into this callback.
+ */
+var callFunctionWhenTransactionMined = function(txHash, f) {
+  var transactionReceipt = web3.eth.getTransactionReceipt(txHash, function(error, result) {
+    if (result) {
+      // removeLoadingGif()
+      f();
+    } else {
+      // addLoadingGif()
+      setTimeout(function() {
+        callFunctionWhenTransactionMined(txHash, f);
+      }, 1000);
+    }
+  });
+};
+
+var addLoadingGif = function() {
+  console.log('adding loading gif')
+  $('#detailsModal').before('<div class="loader"></div>')
+}
+
+var removeLoadingGif = function() {
+  $('.loader').remove()
+}
+
 
 App = {
   web3Provider: null,
@@ -15,12 +44,32 @@ App = {
   },
 
   initWeb3: function() {
+    web3.version.getNetwork((err, netId) => {
+      switch (netId) {
+        case '1':
+          console.log('This is mainnet');
+          break;
+        case '2':
+          console.log('This is the deprecated Morden test network.');
+          break;
+        case '3':
+          console.log('This is the ropsten test network.');
+          break;
+        default:
+          console.log('This is an unknown/private network.');
+      }
+      if (netId != '3') {
+        console.log('You must be on the Ropsten testnet!');
+      }
+    });
+
     // Initialize web3 and set the provider to the testRPC.
     if (typeof web3 !== 'undefined') {
       App.web3Provider = web3.currentProvider;
       web3 = new Web3(web3.currentProvider);
     } else {
       // set the provider you want from Web3.providers
+      console.log('web is undefined, using local testnet.')
       App.web3Provider = new Web3.providers.HttpProvider('http://127.0.0.1:8545');
       web3 = new Web3(App.web3Provider);
     }
@@ -32,10 +81,12 @@ App = {
     $.getJSON('Kudos.json', function(data) {
       // Get the necessary contract artifact file and instantiate it with truffle-contract.
       var KudosTokenArtifact = data;
-      App.contracts.KudosToken = TruffleContract(KudosTokenArtifact);
+      // TrufleContract is for local development only
+      // App.contracts.KudosToken = TruffleContract(KudosTokenArtifact);
+      App.contracts.KudosToken = web3.eth.contract(KudosTokenArtifact.abi).at('0xe7bed272ee374e8116049d0a49737bdda86325b6')
 
       // Set the provider for our contract.
-      App.contracts.KudosToken.setProvider(App.web3Provider);
+      // App.contracts.KudosToken.setProvider(App.web3Provider);
 
       // Use our contract to retieve the user's existing Kudos.
       return App.getKudosForUser();
@@ -137,7 +188,7 @@ App = {
 
   mintKudos: function(newKudo) {
 
-    var kudosContractInstance;
+    var kudosContractInstance = App.contracts.KudosToken;
 
     web3.eth.getAccounts(function(error, accounts) {
       if (error) {
@@ -145,21 +196,18 @@ App = {
       }
 
       var account = accounts[0];
-      App.contracts.KudosToken.deployed().then(function(instance) {
-        kudosContractInstance = instance;
-        return kudosContractInstance.create(newKudo.name, newKudo.description, newKudo.rarity, newKudo.price, newKudo.numClonesAllowed, {from: account, value: new web3.BigNumber(1000000000000000)});
-      }).then(function(result) {
-        App.addKudosArtifact(null, [newKudo.name, newKudo.description, newKudo.rarity, newKudo.price, newKudo.numClonesAllowed])
+
+      kudosContractInstance.create(newKudo.name, newKudo.description, newKudo.rarity, newKudo.price, newKudo.numClonesAllowed, {from: account, value: new web3.BigNumber(1000000000000000)}, function(error, txid) {
         $('.modal').modal('hide')
-      }).catch(function(err) {
-        console.log(err.message);
+        console.log('txid:' + txid)
+        return true;
       });
     });
   },
 
   cloneKudos: function(name, numClones) {
 
-    var kudosContractInstance;
+    var kudosContractInstance = App.contracts.KudosToken;
 
     web3.eth.getAccounts(function(error, accounts) {
       if (error) {
@@ -167,20 +215,18 @@ App = {
       }
 
       var account = accounts[0];
-      App.contracts.KudosToken.deployed().then(function(instance) {
-        kudosContractInstance = instance;
-        return kudosContractInstance.clone(name, numClones, {from: account, value: new web3.BigNumber(1000000000000000)});
-      }).then(function(result) {
+
+      kudosContractInstance.clone(name, numClones, {from: account, value: new web3.BigNumber(1000000000000000)}, function(error, txid) {
         $('.modal').modal('hide')
-      }).catch(function(err) {
-        console.log(err.message);
-      });
+        console.log('txid:' + txid)
+        return true;
+      })
     });
   },
 
   transferKudos: function(toAccount, kudosId) {
 
-    var kudosContractInstance;
+    var kudosContractInstance = App.contracts.KudosToken;
 
     web3.eth.getAccounts(function(error, accounts) {
       if (error) {
@@ -188,21 +234,17 @@ App = {
       }
 
       var account = accounts[0];
-      App.contracts.KudosToken.deployed().then(function(instance) {
-        kudosContractInstance = instance;
-        let fromAccount = account;
-        return kudosContractInstance.transferFrom(fromAccount, toAccount, kudosId);
-      }).then(function(result) {
+      kudosContractInstance.transferFrom(account, toAccount, kudosId, function(error, txid) {
         $('.modal').modal('hide')
-      }).catch(function(err) {
-        console.log(err.message);
-      });
+        console.log('txid:' + txid)
+        return true;
+      })
     });
   },
 
   burnKudos: function(kudosId) {
 
-    var kudosContractInstance;
+    var kudosContractInstance = App.contracts.KudosToken;
 
     web3.eth.getAccounts(function(error, accounts) {
       if (error) {
@@ -210,19 +252,20 @@ App = {
       }
 
       var account = accounts[0];
-      App.contracts.KudosToken.deployed().then(function(instance) {
-        kudosContractInstance = instance;
-        return kudosContractInstance.burn(account, kudosId);
-      }).then(function(result) {
-        return true
-      }).catch(function(err) {
-        console.log(err.message);
-      });
-    });
+      kudosContractInstance.burn(account, kudosId, function(error, txid) {
+        $('.modal').modal('hide')
+        if(error) {
+          console.log(error.message)
+        } else {
+          console.log('txid:' + txid)
+          return true;
+        }
+      })
+    })
   },
 
   getKudosForUser: function() {
-    var kudosContractInstance;
+    var kudosContractInstance = App.contracts.KudosToken;
 
     web3.eth.getAccounts(function(error, accounts) {
       if (error) {
@@ -231,23 +274,17 @@ App = {
 
       var account = accounts[0];
 
-      App.contracts.KudosToken.deployed().then(function(instance) {
-        kudosContractInstance = instance;
-        return kudosContractInstance.balanceOf(account)
-      }).then((result) => { 
-        let balance = parseInt(result);
-        console.log('account: ' + account)
-        console.log('kudos balance:' + balance);
+      kudosContractInstance.balanceOf(account, function(error, balance) {
+        console.log('account:' + account)
+        console.log('kudos balance:' + balance)
         for (let index = 0; index < balance; index++) {
-          kudosContractInstance.tokenOfOwnerByIndex(account, index).then((kudosId) => {
-            kudosContractInstance.getKudoById(kudosId).then((kudos) => {
+          kudosContractInstance.tokenOfOwnerByIndex(account, index, function(error, kudosId) {
+            kudosContractInstance.getKudoById(kudosId, function(error, kudos) {
               App.addKudosArtifact(kudosId, kudos)
             })
           })
         }
-      }).catch(function(err) {
-        console.log(err.message);
-      });
+      })
     });
   },
 
@@ -312,7 +349,7 @@ App = {
     .text('Burn')
 
     $(cardBody).append(cardButton2, cardButton1, 
-      // cardButton3
+      cardButton3
       )
     $(cardElement).append(cardImage, cardBody)
 
