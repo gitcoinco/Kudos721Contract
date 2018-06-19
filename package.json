@@ -22,5 +22,9 @@
   "devDependencies": {
     "lite-server": "^2.3.0"
   },
-  "description": "Kudos App"
+  "description": "Kudos App",
+  "engines": {
+    "node": "10.4.0",
+    "npm": "6.1.0"
+  }
 }
