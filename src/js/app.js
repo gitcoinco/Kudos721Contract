@@ -83,7 +83,7 @@ App = {
       var KudosTokenArtifact = data;
       // TrufleContract is for local development only
       // App.contracts.KudosToken = TruffleContract(KudosTokenArtifact);
-      App.contracts.KudosToken = web3.eth.contract(KudosTokenArtifact.abi).at('0xe7bed272ee374e8116049d0a49737bdda86325b6')
+      App.contracts.KudosToken = web3.eth.contract(KudosTokenArtifact.abi).at('0x84eed760d7b7b54823a7737ce6c5f0a31e840d43')
 
       // Set the provider for our contract.
       // App.contracts.KudosToken.setProvider(App.web3Provider);
