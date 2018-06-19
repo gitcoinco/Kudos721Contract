@@ -51,7 +51,9 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
 
     }
 
-    function burn(address owner, uint256 tokenId) public payable{
+    function burn(address owner, uint256 tokenId) public payable {
+        Kudo memory _kudo = kudos[tokenId];
+        delete nameToTokenId[_kudo.name];
         _burn(owner, tokenId);
     }
 
