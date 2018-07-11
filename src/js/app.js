@@ -1,3 +1,8 @@
+// Global Vars
+
+const contractId = '0xdecc1b8882276a3c55de0443f2ecbb251ca0f947';
+const marketAccount = '0xd386793f1db5f21609571c0164841e5ea2d33ad8';
+
 // replace with IPFS hashes
 
 $.getJSON('kudosArtifacts.json', function(data) {
@@ -83,7 +88,6 @@ App = {
       var KudosTokenArtifact = data;
       // TrufleContract is for local development only
       // App.contracts.KudosToken = TruffleContract(KudosTokenArtifact);
-      contractId = '0xdecc1b8882276a3c55de0443f2ecbb251ca0f947'
       App.contracts.KudosToken = web3.eth.contract(KudosTokenArtifact.abi).at(contractId)
       $('#ropstenMsg').append('<a id=contractLink>Token Information</a')
       $('#contractLink').attr('href', 'https://ropsten.etherscan.io/token/' + contractId)
@@ -92,7 +96,9 @@ App = {
       // App.contracts.KudosToken.setProvider(App.web3Provider);
 
       // Use our contract to retieve the user's existing Kudos.
-      return App.getKudosForUser();
+      App.getGen0KudosForMarketplace();
+      App.getKudosForUser();
+      return;
     }).done(function(done) {
   })
   .fail(function(err) {
@@ -104,26 +110,42 @@ App = {
 
   bindEvents: function() {
     // Mint a gen0 Kudos
-    $('#btnMintGen0').click(function(event) {
-      $('#kudosModalBlank').modal()
-      $('#staticMintDescription').val(kudosMap[$('#nameInput').val()].description)
-      $('#nameInput').change(function () {
-        $('#staticMintDescription').val(kudosMap[$(this).val()].description)
-      })
-    })
+    var kudosContractInstance = App.contracts.KudosToken;
 
-    $('#mint-modal-blank').on('click', function(event) {
-      let newKudo = {
-        'name': $('#nameInput').val().trim(),
-        'description': $('#staticMintDescription').val().trim(),
-        'rarity': $('#rarityInput').val().trim(),
-        'price': parseInt(parseFloat($('#priceInput').val().trim(), 10) * 1000, 10),  // convert from Ether to Finney
-        'numClonesAllowed': parseInt($('#numClonesAllowedInput').val().trim(), 10), 
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
       }
 
-      event.preventDefault();
-      App.mintKudos(newKudo)
+      var account = accounts[0];
+
+      if (account != marketAccount) {
+        $('#btnMintGen0').remove()
+      }
+      else {
+        $('#btnMintGen0').click(function(event) {
+          $('#kudosModalBlank').modal()
+          $('#staticMintDescription').val(kudosMap[$('#nameInput').val()].description)
+          $('#nameInput').change(function () {
+            $('#staticMintDescription').val(kudosMap[$(this).val()].description)
+          })
+        })
+
+        $('#mint-modal-blank').on('click', function(event) {
+          let newKudo = {
+            'name': $('#nameInput').val().trim(),
+            'description': $('#staticMintDescription').val().trim(),
+            'rarity': $('#rarityInput').val().trim(),
+            'price': parseInt(parseFloat($('#priceInput').val().trim(), 10) * 1000, 10),  // convert from Ether to Finney
+            'numClonesAllowed': parseInt($('#numClonesAllowedInput').val().trim(), 10), 
+          }
+
+          event.preventDefault();
+          App.mintKudos(newKudo)
+        });
+      }
     });
+
 
     // Click on Kudos image to get detail
     $(document).on('click', '.card-img-top', function(event) {
@@ -267,7 +289,33 @@ App = {
     })
   },
 
+  getGen0KudosForMarketplace: function() {
+    var section = '#marketplace-kudos';
+    var kudosContractInstance = App.contracts.KudosToken;
+
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
+      }
+
+      var account = marketAccount
+
+      kudosContractInstance.balanceOf(account, function(error, balance) {
+        console.log('account:' + account)
+        console.log('kudos balance:' + balance)
+        for (let index = 0; index < balance; index++) {
+          kudosContractInstance.tokenOfOwnerByIndex(account, index, function(error, kudosId) {
+            kudosContractInstance.getKudoById(kudosId, function(error, kudos) {
+              App.addKudosArtifact(kudosId, kudos, section)
+            })
+          })
+        }
+      })
+    });
+  },
+
   getKudosForUser: function() {
+    var section = '#owner-kudos';
     var kudosContractInstance = App.contracts.KudosToken;
 
     web3.eth.getAccounts(function(error, accounts) {
@@ -276,14 +324,21 @@ App = {
       }
 
       var account = accounts[0];
+      if (account == marketAccount) {
+        return false;
+      }
 
       kudosContractInstance.balanceOf(account, function(error, balance) {
         console.log('account:' + account)
         console.log('kudos balance:' + balance)
         for (let index = 0; index < balance; index++) {
           kudosContractInstance.tokenOfOwnerByIndex(account, index, function(error, kudosId) {
+            console.log(parseInt(kudosId, 10));
             kudosContractInstance.getKudoById(kudosId, function(error, kudos) {
-              App.addKudosArtifact(kudosId, kudos)
+              if (error != null) {
+                console.error(error)
+              }
+              App.addKudosArtifact(kudosId, kudos, section)
             })
           })
         }
@@ -291,7 +346,7 @@ App = {
     });
   },
 
-  addKudosArtifact: function (kudosId, kudos) {
+  addKudosArtifact: function (kudosId, kudos, sectionId) {
 
     kudosObj = {
       kudosId: kudosId,
@@ -303,60 +358,78 @@ App = {
       kudosNumClonesInWild: kudos[5]
     }
 
-    let source = kudosMap[kudos[0]].image
-    if(source == undefined) {
-      source = 'https://robohash.org/' + kudos[0];
-    }
+    var kudosContractInstance = App.contracts.KudosToken;
 
-    let cardElement = document.createElement('div')
-    $(cardElement).attr('class', 'card border-0 p-2 text-center').attr('style', 'width: 10rem;')
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
+      }
 
-    let cardImage = document.createElement('img')
-    $(cardImage).attr('class', 'card-img-top').attr('src', source).attr('style', 'height: 150px;')
-    .attr(kudosObj)
+      var account = accounts[0];
 
-    let cardBody = document.createElement('div')
-    cardBody.setAttribute('class', 'card-body p-0')
 
-    let cardInfo = document.createElement('p')
-    cardInfo.setAttribute('class', 'card-text')
-    cardInfo.innerHTML = '<b>ID #:</b> ' + kudosId + '<br>' + '<b>Name:</b> ' + kudosMap[kudos[0]].name
-    $(cardBody).append(cardInfo)
+      let source = kudosMap[kudos[0]].image
+      if(source == undefined) {
+        source = 'https://robohash.org/' + kudos[0];
+      }
 
-    // Grey out the Clone button if numClonesAvailable == 0
-    if(kudos[4] != 0) {
-      var cardButton1 = document.createElement('button')
-      $(cardButton1).attr('type', 'button').attr('data-toggle', 'modal')
-      .attr('class', 'btn btn-sm btn-primary btn-block btn-clone')
+      let cardElement = document.createElement('div')
+      $(cardElement).attr('class', 'card border-0 p-2 text-center').attr('style', 'width: 10rem;')
+
+      let cardImage = document.createElement('img')
+      $(cardImage).attr('class', 'card-img-top').attr('src', source).attr('style', 'height: 150px;')
       .attr(kudosObj)
-      .text('Clone')
-    } 
-    // else if (kudosObj.kudosNumClonesInWild >= kudosObj.kudosNumClonesAllowed ) {
-    //   $(cardButton1).attr('type', 'button').attr('data-toggle', 'modal').attr('kudosName', kudos[0])
-    //   .attr('class', 'btn btn-sm btn-primary btn-block btn-clone').attr('disabled')
-    //   .text('Clone')
-    // } 
-    else {
-      var cardButton1 = document.createElement('p')
-    }
+
+      let cardBody = document.createElement('div')
+      cardBody.setAttribute('class', 'card-body p-0')
+
+      let cardInfo = document.createElement('p')
+      cardInfo.setAttribute('class', 'card-text')
+      cardInfo.innerHTML = '<b>ID #:</b> ' + kudosId + '<br>' + '<b>Name:</b> ' + kudosMap[kudos[0]].name
+      $(cardBody).append(cardInfo)
+
+      // Grey out the Clone button if numClonesAvailable == 0
+      if(kudos[4] != 0) {
+        var cardButton1 = document.createElement('button')
+        $(cardButton1).attr('type', 'button').attr('data-toggle', 'modal')
+        .attr('class', 'btn btn-sm btn-primary btn-block btn-clone')
+        .attr(kudosObj)
+        .text('Clone')
+      } 
+      // else if (kudosObj.kudosNumClonesInWild >= kudosObj.kudosNumClonesAllowed ) {
+      //   $(cardButton1).attr('type', 'button').attr('data-toggle', 'modal').attr('kudosName', kudos[0])
+      //   .attr('class', 'btn btn-sm btn-primary btn-block btn-clone').attr('disabled')
+      //   .text('Clone')
+      // } 
+      else {
+        var cardButton1 = document.createElement('p')
+      }
+
+      console.log(sectionId)
+      if (sectionId == '#owner-kudos' || account == marketAccount) {
+        var cardButton2 = document.createElement('button')
+        $(cardButton2).attr('type', 'button').attr('class', 'btn btn-sm btn-secondary btn-block btn-transfer').attr('data-toggle', 'modal')
+        .attr('kudosId', kudosId)
+        .text('Transfer')
+
+        var cardButton3 = document.createElement('button')
+        $(cardButton3).attr('type', 'button').attr('class', 'btn btn-sm btn-danger btn-block btn-burn').attr('data-toggle', 'modal')
+        .attr('kudosId', kudosId)
+        .text('Burn')
+      }
+      else {
+        var cardButton2 = document.createElement('p')
+        var cardButton3 = document.createElement('p')
+      }
 
 
-    let cardButton2 = document.createElement('button')
-    $(cardButton2).attr('type', 'button').attr('class', 'btn btn-sm btn-secondary btn-block btn-transfer').attr('data-toggle', 'modal')
-    .attr('kudosId', kudosId)
-    .text('Transfer')
+      $(cardBody).append(cardButton2, cardButton1, 
+        cardButton3
+        )
+      $(cardElement).append(cardImage, cardBody)
 
-    let cardButton3 = document.createElement('button')
-    $(cardButton3).attr('type', 'button').attr('class', 'btn btn-sm btn-danger btn-block btn-burn').attr('data-toggle', 'modal')
-    .attr('kudosId', kudosId)
-    .text('Burn')
-
-    $(cardBody).append(cardButton2, cardButton1, 
-      cardButton3
-      )
-    $(cardElement).append(cardImage, cardBody)
-
-    $('#owner-kudos').append(cardElement)
+      $(sectionId).append(cardElement)
+    });
   },
 
 };
