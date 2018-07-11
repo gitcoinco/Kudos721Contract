@@ -223,24 +223,38 @@
       </div>
     </div>
 
-    <!-- Available Kudos in marketplace -->
+    <!-- Mint Gen0 Kudos -->
     <div class="container" align="center">
         <div class="card border-0 p-2" style="width: 15rem;">
           <div class="card-body">
             <p class="card-text"></p>
             <button type="button" class="btn btn-success btn-lg mint-button" id=btnMintGen0>Mint Gen0</button>
+
           </div>
+          <small id=ropstenMsg>Note: Must be on Ropsten network. <br> </small>
         </div>
       </div>
 
     </div>
 
+    <!-- Show kudos in the Marketplace -->
     <div class="container" align="center">
-      <h1 class="display-2" id=yourKudos>Your Kudos</h1>
-      <small id=ropstenMsg>Please connect to Ropsten network.  </small>
+      <h1 class="display-2" id=gen0Kudos>Marketplace Kudos</h1>
+      <small>Owner:  0xD386793F1DB5F21609571C0164841E5eA2D33aD8</small>
+    </div>
+    <div class="container">
+        <label></label> <img id="loading" src="loading.gif" height="40px" width="auto" style="visibility: hidden"/>
+        <div class="row justify-content-center" id=marketplace-kudos></div>
+    </div>
+
+    <!-- Spacer -->
+    <div class="container have-some-margin" align="center">
     </div>
 
     <!-- Show kudos that you own -->
+    <div class="container" align="center">
+      <h1 class="display-2" id=yourKudos>Your Kudos</h1>
+    </div>
     <div class="container">
         <label></label> <img id="loading" src="loading.gif" height="40px" width="auto" style="visibility: hidden"/>
         <div class="row justify-content-center" id=owner-kudos></div>
