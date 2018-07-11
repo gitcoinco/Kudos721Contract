@@ -17,8 +17,9 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
 
     mapping(string => uint256) internal nameToTokenId;
 
-    function create(string name, string description, uint256 rareness, uint256 price, uint256 numClonesAllowed) public payable {
-        // require(nameToTokenId[name] == 0);
+    function create(string name, string description, uint256 rareness, uint256 price, uint256 numClonesAllowed) public payable onlyOwner {
+        // Ensure that each Gen0 Kudos is unique
+        require(nameToTokenId[name] == 0);
         uint256 _numClonesInWild = 0;
 
         Kudo memory _kudo = Kudo({name: name, description: description, rareness: rareness, price: price, numClonesAllowed: numClonesAllowed, numClonesInWild: _numClonesInWild});
@@ -46,6 +47,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
 
             // The new kudo is pushed onto the array and minted
             uint256 tokenId = kudos.push(_newKudo) - 1;
+
             _mint(msg.sender, tokenId);
         }
 
@@ -69,7 +71,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
     }
 
 
-    function getTokenId(string name) view public returns (uint256) {
+    function getGen0TokenId(string name) view public returns (uint256) {
         return nameToTokenId[name];
     }
 
