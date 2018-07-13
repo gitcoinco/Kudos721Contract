@@ -41,9 +41,14 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
 
         // Create new kudo, don't let it be cloned
         for (uint i = 0; i < numClonesRequested; i++) {
-            Kudo memory _newKudo = _kudo;
+            Kudo memory _newKudo;
+            _newKudo.name = _kudo.name;
+            _newKudo.description = _kudo.description;
+            _newKudo.rareness = _kudo.rareness;
+            _newKudo.price = _kudo.price;
             _newKudo.numClonesAllowed = 0;
-            _newKudo.numClonesInWild = _kudo.numClonesInWild;
+            _newKudo.numClonesInWild = 0;
+
 
             // The new kudo is pushed onto the array and minted
             uint256 tokenId = kudos.push(_newKudo) - 1;
@@ -53,11 +58,21 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
 
     }
 
-    function burn(address owner, uint256 tokenId) public payable {
+    function burnGen0(address owner, uint256 tokenId) public payable onlyOwner {
         Kudo memory _kudo = kudos[tokenId];
         delete nameToTokenId[_kudo.name];
         _burn(owner, tokenId);
     }
+
+    function burn(address owner, uint256 tokenId) public payable {
+        Kudo memory _kudo = kudos[tokenId];
+        uint256 gen0Id = nameToTokenId[_kudo.name];
+        Kudo memory _gen0Kudo = kudos[gen0Id];
+        _gen0Kudo.numClonesInWild -= 1;
+        kudos[gen0Id] = _gen0Kudo;
+        _burn(owner, tokenId);
+    }
+
 
     function getKudoById(uint256 tokenId) view public returns (string name, string description, uint256 rareness, uint256 price, uint256 numClonesAllowed, uint256 numClonesInWild) {
         Kudo memory _kudo = kudos[tokenId];
