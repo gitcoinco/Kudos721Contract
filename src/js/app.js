@@ -1,6 +1,6 @@
 // Global Vars
 
-const contractId = '0xdecc1b8882276a3c55de0443f2ecbb251ca0f947';
+const contractId = '0x3d7601724498d7b4ae1eec5c6a37a7f1a5398c15';
 const marketAccount = '0xd386793f1db5f21609571c0164841e5ea2d33ad8';
 
 // replace with IPFS hashes
@@ -122,7 +122,7 @@ App = {
       if (account != marketAccount) {
         $('#btnMintGen0').remove()
       }
-      else {
+
         $('#btnMintGen0').click(function(event) {
           $('#kudosModalBlank').modal()
           $('#staticMintDescription').val(kudosMap[$('#nameInput').val()].description)
@@ -143,12 +143,11 @@ App = {
           event.preventDefault();
           App.mintKudos(newKudo)
         });
-      }
     });
 
 
-    // Click on Kudos image to get detail
-    $(document).on('click', '.card-img-top', function(event) {
+    // Click on  Marketpalce Kudos image to get detail
+    $(document).on('click', '#marketplace-kudos-img', function(event) {
       $('#detailsModal').modal()
       // Map the image attributes set in addKudosArtifact to the model elements
       $('#staticDetailsKudosId').val($(this).attr('kudosId'))
@@ -157,7 +156,20 @@ App = {
       $('#staticDetailsRarity').val($(this).attr('kudosRarity'))
       $('#staticDetailsPrice').val($(this).attr('kudosPrice'))
       $('#staticDetailsNumClonesAllowed').val($(this).attr('kudosNumClonesAllowed'))
-      $('#staticDetailsNumClonesInWild').val($(this).attr('kudosNumClonesInWild'))
+      $('#staticDetailsNumClonesInWild').val($(this).attr('kudosNumClonesinWild'))
+    })
+
+    // Click on User Kudos image to get detail
+    $(document).on('click', '#owner-kudos-img', function(event) {
+      $('#detailsModal').modal()
+      // Map the image attributes set in addKudosArtifact to the model elements
+      $('#staticDetailsKudosId').val($(this).attr('kudosId'))
+      $('#staticDetailsName').val($(this).attr('kudosName'))
+      $('#staticDetailsDescription').val($(this).attr('kudosDescription'))
+      $('#staticDetailsRarity').val($(this).attr('kudosRarity'))
+      $('#staticDetailsPrice').val($(this).attr('kudosPrice'))
+      $('#staticDetailsNumClonesAllowed').val('N/A')
+      $('#staticDetailsNumClonesInWild').val('N/A')
     })
 
     // Clone button
@@ -290,7 +302,7 @@ App = {
   },
 
   getGen0KudosForMarketplace: function() {
-    var section = '#marketplace-kudos';
+    var section = 'marketplace-kudos';
     var kudosContractInstance = App.contracts.KudosToken;
 
     web3.eth.getAccounts(function(error, accounts) {
@@ -301,7 +313,7 @@ App = {
       var account = marketAccount
 
       kudosContractInstance.balanceOf(account, function(error, balance) {
-        console.log('account:' + account)
+        console.log('marketplace account:' + account)
         console.log('kudos balance:' + balance)
         for (let index = 0; index < balance; index++) {
           kudosContractInstance.tokenOfOwnerByIndex(account, index, function(error, kudosId) {
@@ -315,7 +327,7 @@ App = {
   },
 
   getKudosForUser: function() {
-    var section = '#owner-kudos';
+    var section = 'owner-kudos';
     var kudosContractInstance = App.contracts.KudosToken;
 
     web3.eth.getAccounts(function(error, accounts) {
@@ -329,12 +341,13 @@ App = {
       }
 
       kudosContractInstance.balanceOf(account, function(error, balance) {
-        console.log('account:' + account)
+        console.log('user account:' + account)
         console.log('kudos balance:' + balance)
         for (let index = 0; index < balance; index++) {
           kudosContractInstance.tokenOfOwnerByIndex(account, index, function(error, kudosId) {
-            console.log(parseInt(kudosId, 10));
+            // console.log(parseInt(kudosId, 10));
             kudosContractInstance.getKudoById(kudosId, function(error, kudos) {
+              // console.log(kudos);
               if (error != null) {
                 console.error(error)
               }
@@ -345,6 +358,10 @@ App = {
       })
     });
   },
+
+  // addKudosUserArtifact:
+
+  // addKudosMarketplaceArtifact: function 
 
   addKudosArtifact: function (kudosId, kudos, sectionId) {
 
@@ -357,6 +374,10 @@ App = {
       kudosNumClonesAllowed: kudos[4],
       kudosNumClonesInWild: kudos[5]
     }
+
+    console.log('sectionId:' + sectionId)
+    console.log('numClonesAllowed:' + parseInt(kudosObj.kudosNumClonesAllowed, 10))
+    console.log('numClonesInWild:' + parseInt(kudosObj.kudosNumClonesInWild, 10))
 
     var kudosContractInstance = App.contracts.KudosToken;
 
@@ -376,8 +397,9 @@ App = {
       let cardElement = document.createElement('div')
       $(cardElement).attr('class', 'card border-0 p-2 text-center').attr('style', 'width: 10rem;')
 
+      // Sets all the attributes for the kudosObj
       let cardImage = document.createElement('img')
-      $(cardImage).attr('class', 'card-img-top').attr('src', source).attr('style', 'height: 150px;')
+      $(cardImage).attr('class', 'card-img-top').attr('src', source).attr('style', 'height: 150px;').attr('id', sectionId + '-img')
       .attr(kudosObj)
 
       let cardBody = document.createElement('div')
@@ -405,8 +427,7 @@ App = {
         var cardButton1 = document.createElement('p')
       }
 
-      console.log(sectionId)
-      if (sectionId == '#owner-kudos' || account == marketAccount) {
+      // if (sectionId == '#owner-kudos' || account == marketAccount) {
         var cardButton2 = document.createElement('button')
         $(cardButton2).attr('type', 'button').attr('class', 'btn btn-sm btn-secondary btn-block btn-transfer').attr('data-toggle', 'modal')
         .attr('kudosId', kudosId)
@@ -416,11 +437,11 @@ App = {
         $(cardButton3).attr('type', 'button').attr('class', 'btn btn-sm btn-danger btn-block btn-burn').attr('data-toggle', 'modal')
         .attr('kudosId', kudosId)
         .text('Burn')
-      }
-      else {
-        var cardButton2 = document.createElement('p')
-        var cardButton3 = document.createElement('p')
-      }
+      // }
+      // else {
+      //   var cardButton2 = document.createElement('p')
+      //   var cardButton3 = document.createElement('p')
+      // }
 
 
       $(cardBody).append(cardButton2, cardButton1, 
@@ -428,7 +449,7 @@ App = {
         )
       $(cardElement).append(cardImage, cardBody)
 
-      $(sectionId).append(cardElement)
+      $('#' + sectionId).append(cardElement)
     });
   },
 
