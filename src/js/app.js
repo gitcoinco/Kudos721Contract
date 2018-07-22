@@ -1,6 +1,6 @@
 // Global Vars
 
-const contractId = '0x3d7601724498d7b4ae1eec5c6a37a7f1a5398c15';
+const contractId = '0xe7bed272ee374e8116049d0a49737bdda86325b6';
 const marketAccount = '0xd386793f1db5f21609571c0164841e5ea2d33ad8';
 
 // replace with IPFS hashes
@@ -61,11 +61,11 @@ App = {
           console.log('This is the ropsten test network.');
           break;
         default:
-          console.log('This is an unknown/private network.');
+          console.log('On localnet.  Id is: ' + netId);
       }
-      if (netId != '3') {
-        console.log('You must be on the Ropsten testnet!');
-      }
+      // if (netId != '3') {
+      //   console.log('You must be on the Ropsten testnet!');
+      // }
     });
 
     // Initialize web3 and set the provider to the testRPC.
@@ -91,6 +91,7 @@ App = {
       App.contracts.KudosToken = web3.eth.contract(KudosTokenArtifact.abi).at(contractId)
       $('#ropstenMsg').append('<a id=contractLink>Token Information</a')
       $('#contractLink').attr('href', 'https://ropsten.etherscan.io/token/' + contractId)
+      $('#contractId').html('Contract ID: ' + contractId)
 
       // Set the provider for our contract.
       // App.contracts.KudosToken.setProvider(App.web3Provider);
@@ -234,7 +235,7 @@ App = {
 
       var account = accounts[0];
 
-      kudosContractInstance.create(newKudo.name, newKudo.description, newKudo.rarity, newKudo.price, newKudo.numClonesAllowed, {from: account, value: new web3.BigNumber(1000000000000000)}, function(error, txid) {
+      kudosContractInstance.mint(newKudo.name, newKudo.description, newKudo.rarity, newKudo.price, newKudo.numClonesAllowed, {from: account, value: new web3.BigNumber(1000000000000000)}, function(error, txid) {
         $('.modal').modal('hide')
         console.log('txid:' + txid)
         return true;
@@ -317,7 +318,7 @@ App = {
         console.log('kudos balance:' + balance)
         for (let index = 0; index < balance; index++) {
           kudosContractInstance.tokenOfOwnerByIndex(account, index, function(error, kudosId) {
-            kudosContractInstance.getKudoById(kudosId, function(error, kudos) {
+            kudosContractInstance.getKudosById(kudosId, function(error, kudos) {
               App.addKudosArtifact(kudosId, kudos, section)
             })
           })
@@ -346,7 +347,7 @@ App = {
         for (let index = 0; index < balance; index++) {
           kudosContractInstance.tokenOfOwnerByIndex(account, index, function(error, kudosId) {
             // console.log(parseInt(kudosId, 10));
-            kudosContractInstance.getKudoById(kudosId, function(error, kudos) {
+            kudosContractInstance.getKudosById(kudosId, function(error, kudos) {
               // console.log(kudos);
               if (error != null) {
                 console.error(error)
