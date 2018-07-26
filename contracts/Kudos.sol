@@ -6,27 +6,27 @@ import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
 contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable { 
     struct Kudo {
         string name;
-        string description;         // move to metadata in IPFS
+        string description;         // move to metadata in IPFS?
         uint256 rarity;
-        uint256 price;
+        uint256 price;              // price in finney
         uint256 numClonesAllowed;
         uint256 numClonesInWild;
         address lister;
-        string tags;                // move to metadata in IPFS
-        string image;               // move to metadata in IPFS
+        string tags;                // move to metadata in IPFS?
+        string image;               // IPFS Hash
     }
 
     Kudo[] public kudos;
 
     mapping(string => uint256) internal nameToTokenId;
 
-    function mint(string name, string description, uint256 rarity, uint256 price, uint256 numClonesAllowed, string tags) public payable onlyOwner {
+    function mint(string name, string description, uint256 rarity, uint256 price, uint256 numClonesAllowed, string tags, string image) public payable onlyOwner {
         // Ensure that each Gen0 Kudos is unique
         require(nameToTokenId[name] == 0);
         uint256 _numClonesInWild = 0;
         address _lister = msg.sender;
 
-        Kudo memory _kudo = Kudo({name: name, description: description, rarity: rarity, price: price, numClonesAllowed: numClonesAllowed, numClonesInWild: _numClonesInWild, lister: _lister, tags: tags});
+        Kudo memory _kudo = Kudo({name: name, description: description, rarity: rarity, price: price, numClonesAllowed: numClonesAllowed, numClonesInWild: _numClonesInWild, lister: _lister, tags: tags, image: image});
         uint256 tokenId = kudos.push(_kudo) - 1;
 
         _mint(msg.sender, tokenId);
@@ -54,6 +54,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
             _newKudo.numClonesInWild = 0;
             _newKudo.lister = msg.sender;
             _newKudo.tags = _kudo.tags;
+            _newKudo.image = _kudo.image;
 
 
             // The new kudo is pushed onto the array and minted
@@ -80,7 +81,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
     }
 
 
-    function getKudosById(uint256 tokenId) view public returns (string name, string description, uint256 rarity, uint256 price, uint256 numClonesAllowed, uint256 numClonesInWild, address lister, string tags) {
+    function getKudosById(uint256 tokenId) view public returns (string name, string description, uint256 rarity, uint256 price, uint256 numClonesAllowed, uint256 numClonesInWild, address lister, string tags, string image) {
         Kudo memory _kudo = kudos[tokenId];
 
         name = _kudo.name;
@@ -91,6 +92,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         numClonesInWild = _kudo.numClonesInWild;
         lister = _kudo.lister;
         tags = _kudo.tags;
+        image = _kudo.image;
     }
 
 
