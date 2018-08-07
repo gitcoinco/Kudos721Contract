@@ -33,6 +33,12 @@ module.exports = {
       },
       network_id: 3
     },
+    rinkeby: {
+      provider: function() {
+        return new HDWalletProvider(mnemonic, 'https://rinkeby.infura.io/' + token)
+      },
+      network_id: 4
+    },
     development: {
       host: "localhost",
       port: 8545,
