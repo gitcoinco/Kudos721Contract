@@ -97,6 +97,9 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
 
 
     function getGen0TokenId(string name) view public returns (uint256) {
+        // Will return a default value of 0 if the name is not found in the mapping.
+        // Will also return 0 for the name that maps to an id of 0.
+        // TODO:  Make this better by using a struct type.
         return nameToTokenId[name];
     }
 
