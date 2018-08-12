@@ -11,7 +11,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         uint256 price;              // price in finney
         uint256 numClonesAllowed;
         uint256 numClonesInWild;
-        address lister;
+        address ownerAddress;
         string tags;                // move to metadata in IPFS?
         string image;               // IPFS Hash
     }
@@ -24,9 +24,9 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         // Ensure that each Gen0 Kudos is unique
         require(nameToTokenId[name] == 0);
         uint256 _numClonesInWild = 0;
-        address _lister = msg.sender;
+        address _ownerAddress = msg.sender;
 
-        Kudo memory _kudo = Kudo({name: name, description: description, rarity: rarity, price: price, numClonesAllowed: numClonesAllowed, numClonesInWild: _numClonesInWild, lister: _lister, tags: tags, image: image});
+        Kudo memory _kudo = Kudo({name: name, description: description, rarity: rarity, price: price, numClonesAllowed: numClonesAllowed, numClonesInWild: _numClonesInWild, ownerAddress: _ownerAddress, tags: tags, image: image});
         uint256 tokenId = kudos.push(_kudo) - 1;
 
         _mint(msg.sender, tokenId);
@@ -52,7 +52,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
             _newKudo.price = _kudo.price;
             _newKudo.numClonesAllowed = 0;
             _newKudo.numClonesInWild = 0;
-            _newKudo.lister = msg.sender;
+            _newKudo.ownerAddress = msg.sender;
             _newKudo.tags = _kudo.tags;
             _newKudo.image = _kudo.image;
 
@@ -81,7 +81,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
     }
 
 
-    function getKudosById(uint256 tokenId) view public returns (string name, string description, uint256 rarity, uint256 price, uint256 numClonesAllowed, uint256 numClonesInWild, address lister, string tags, string image) {
+    function getKudosById(uint256 tokenId) view public returns (string name, string description, uint256 rarity, uint256 price, uint256 numClonesAllowed, uint256 numClonesInWild, address ownerAddress, string tags, string image) {
         Kudo memory _kudo = kudos[tokenId];
 
         name = _kudo.name;
@@ -90,7 +90,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         price = _kudo.price;
         numClonesAllowed = _kudo.numClonesAllowed;
         numClonesInWild = _kudo.numClonesInWild;
-        lister = _kudo.lister;
+        ownerAddress = _kudo.ownerAddress;
         tags = _kudo.tags;
         image = _kudo.image;
     }
