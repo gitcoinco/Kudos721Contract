@@ -51,7 +51,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
             _newKudo.rarity = _kudo.rarity;
             _newKudo.price = _kudo.price;
             _newKudo.numClonesAllowed = 0;
-            _newKudo.numClonesInWild = 0;
+            _newKudo.numClonesInWild = _kudo.numClonesInWild;
             _newKudo.ownerAddress = msg.sender;
             _newKudo.tags = _kudo.tags;
             _newKudo.image = _kudo.image;
