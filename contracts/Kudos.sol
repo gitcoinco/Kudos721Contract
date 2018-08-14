@@ -30,6 +30,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
 
         Kudo memory _kudo = Kudo({name: name, description: description, rarity: rarity, price: price, numClonesAllowed: numClonesAllowed, numClonesInWild: _numClonesInWild, ownerAddress: _ownerAddress, tags: tags, image: image, clonedFromId: _clonedFromId});
         uint256 tokenId = kudos.push(_kudo) - 1;
+        kudos[tokenId].clonedFromId = tokenId;
 
         _mint(msg.sender, tokenId);
 
