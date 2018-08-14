@@ -14,6 +14,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         address ownerAddress;
         string tags;                // move to metadata in IPFS?
         string image;               // IPFS Hash
+        uint256 clonedFromId;       // id of gen0 kudos
     }
 
     Kudo[] public kudos;
@@ -25,8 +26,9 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         require(nameToTokenId[name] == 0);
         uint256 _numClonesInWild = 0;
         address _ownerAddress = msg.sender;
+        uint256 _clonedFromId = 0;
 
-        Kudo memory _kudo = Kudo({name: name, description: description, rarity: rarity, price: price, numClonesAllowed: numClonesAllowed, numClonesInWild: _numClonesInWild, ownerAddress: _ownerAddress, tags: tags, image: image});
+        Kudo memory _kudo = Kudo({name: name, description: description, rarity: rarity, price: price, numClonesAllowed: numClonesAllowed, numClonesInWild: _numClonesInWild, ownerAddress: _ownerAddress, tags: tags, image: image, clonedFromId: _clonedFromId});
         uint256 tokenId = kudos.push(_kudo) - 1;
 
         _mint(msg.sender, tokenId);
@@ -36,12 +38,13 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
 
     function clone(string name, uint256 numClonesRequested) public payable {
         // Grab existing Kudo blueprint
-        Kudo memory _kudo = kudos[nameToTokenId[name]];
+        uint256 gen0KudosId = nameToTokenId[name];
+        Kudo memory _kudo = kudos[gen0KudosId];
         require(_kudo.numClonesInWild + numClonesRequested <= _kudo.numClonesAllowed);
 
         // Update original kudo struct in the array
         _kudo.numClonesInWild += numClonesRequested;
-        kudos[nameToTokenId[name]] = _kudo;
+        kudos[gen0KudosId] = _kudo;
 
         // Create new kudo, don't let it be cloned
         for (uint i = 0; i < numClonesRequested; i++) {
@@ -55,10 +58,13 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
             _newKudo.ownerAddress = msg.sender;
             _newKudo.tags = _kudo.tags;
             _newKudo.image = _kudo.image;
+            _newKudo.clonedFromId = gen0KudosId;
 
 
             // The new kudo is pushed onto the array and minted
-            uint256 tokenId = kudos.push(_newKudo) - 1;
+            // Start the kudos ID at 1 instead of 0.  Solidity uses 0 as a default value when an
+            // item is not found in a mapping.  Also 0 is used to denote "not used".
+            uint256 tokenId = kudos.push(_newKudo);
 
             _mint(msg.sender, tokenId);
         }
@@ -81,7 +87,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
     }
 
 
-    function getKudosById(uint256 tokenId) view public returns (string name, string description, uint256 rarity, uint256 price, uint256 numClonesAllowed, uint256 numClonesInWild, address ownerAddress, string tags, string image) {
+    function getKudosById(uint256 tokenId) view public returns (string name, string description, uint256 rarity, uint256 price, uint256 numClonesAllowed, uint256 numClonesInWild, address ownerAddress, string tags, string image, uint256 clonedFromId) {
         Kudo memory _kudo = kudos[tokenId];
 
         name = _kudo.name;
@@ -93,6 +99,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         ownerAddress = _kudo.ownerAddress;
         tags = _kudo.tags;
         image = _kudo.image;
+        clonedFromId = _kudo.clonedFromId;
     }
 
 
