@@ -19,9 +19,14 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
 
     Kudo[] public kudos;
 
+    // constructor (Kudo[] kudos) public {
+    //     // Throw away the first index, and use 0 to check if the data exists
+    //     kudos.push(0);
+    // }
+
     mapping(string => uint256) internal nameToTokenId;
 
-    function mint(string name, string description, uint256 rarity, uint256 price, uint256 numClonesAllowed, string tags, string image) public payable onlyOwner {
+    function mint(string name, string description, uint256 rarity, uint256 price, uint256 numClonesAllowed, string tags, string image) public payable onlyOwner returns (uint256 tokenId) {
         // Ensure that each Gen0 Kudos is unique
         require(nameToTokenId[name] == 0);
         uint256 _numClonesInWild = 0;
@@ -29,12 +34,21 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         uint256 _clonedFromId = 0;
 
         Kudo memory _kudo = Kudo({name: name, description: description, rarity: rarity, price: price, numClonesAllowed: numClonesAllowed, numClonesInWild: _numClonesInWild, ownerAddress: _ownerAddress, tags: tags, image: image, clonedFromId: _clonedFromId});
-        uint256 tokenId = kudos.push(_kudo) - 1;
+        // The new kudo is pushed onto the array and minted
+        // Note that Solidity uses 0 as a default value when an item is not found in a mapping.
+
+        // If the array is new, skip over the first index.
+        if(kudos.length == 0) {
+            Kudo memory _dummyKudo = Kudo({name: 'dummy', description: 'dummy', rarity: 0, price: 0, numClonesAllowed: 0, numClonesInWild: 0, ownerAddress: _ownerAddress, tags: 'dummy', image: 'dummy', clonedFromId: 0});
+            kudos.push(_dummyKudo);
+        }
+        tokenId = kudos.push(_kudo) - 1;
         kudos[tokenId].clonedFromId = tokenId;
 
         _mint(msg.sender, tokenId);
 
         nameToTokenId[name] = tokenId;
+        // return tokenId;
     }
 
     function clone(string name, uint256 numClonesRequested) public payable {
@@ -61,13 +75,43 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
             _newKudo.image = _kudo.image;
             _newKudo.clonedFromId = gen0KudosId;
 
-
-            // The new kudo is pushed onto the array and minted
-            // Start the kudos ID at 1 instead of 0.  Solidity uses 0 as a default value when an
-            // item is not found in a mapping.  Also 0 is used to denote "not used".
-            uint256 tokenId = kudos.push(_newKudo);
+            // Note that Solidity uses 0 as a default value when an item is not found in a mapping.
+            uint256 tokenId = kudos.push(_newKudo) - 1;
 
             _mint(msg.sender, tokenId);
+        }
+
+    }
+
+    function cloneAndTransfer(string name, uint256 numClonesRequested, address receiver) public payable {
+        // Grab existing Kudo blueprint
+        uint256 gen0KudosId = nameToTokenId[name];
+        Kudo memory _kudo = kudos[gen0KudosId];
+        require(_kudo.numClonesInWild + numClonesRequested <= _kudo.numClonesAllowed);
+
+        // Update original kudo struct in the array
+        _kudo.numClonesInWild += numClonesRequested;
+        kudos[gen0KudosId] = _kudo;
+
+        // Create new kudo, don't let it be cloned
+        for (uint i = 0; i < numClonesRequested; i++) {
+            Kudo memory _newKudo;
+            _newKudo.name = _kudo.name;
+            _newKudo.description = _kudo.description;
+            _newKudo.rarity = _kudo.rarity;
+            _newKudo.price = _kudo.price;
+            _newKudo.numClonesAllowed = 0;
+            _newKudo.numClonesInWild = _kudo.numClonesInWild;
+            _newKudo.ownerAddress = msg.sender;
+            _newKudo.tags = _kudo.tags;
+            _newKudo.image = _kudo.image;
+            _newKudo.clonedFromId = gen0KudosId;
+
+            // Note that Solidity uses 0 as a default value when an item is not found in a mapping.
+            uint256 tokenId = kudos.push(_newKudo) - 1;
+
+            _mint(msg.sender, tokenId);
+            transferFrom(msg.sender, receiver, tokenId);
         }
 
     }
@@ -105,9 +149,9 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
 
 
     function getGen0TokenId(string name) view public returns (uint256) {
-        // Will return a default value of 0 if the name is not found in the mapping.
-        // Will also return 0 for the name that maps to an id of 0.
-        // TODO:  Make this better by using a struct type.
+        // If the result is 0 it means the key was not found in the mapping.
+        // string memory name = nameToTokenId[name];
+        // if(name == 0) throw;
         return nameToTokenId[name];
     }
 
