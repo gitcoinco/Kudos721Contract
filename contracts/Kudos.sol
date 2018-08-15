@@ -102,7 +102,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
             _newKudo.price = _kudo.price;
             _newKudo.numClonesAllowed = 0;
             _newKudo.numClonesInWild = _kudo.numClonesInWild;
-            _newKudo.ownerAddress = msg.sender;
+            _newKudo.ownerAddress = receiver;
             _newKudo.tags = _kudo.tags;
             _newKudo.image = _kudo.image;
             _newKudo.clonedFromId = gen0KudosId;
@@ -110,8 +110,8 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
             // Note that Solidity uses 0 as a default value when an item is not found in a mapping.
             uint256 tokenId = kudos.push(_newKudo) - 1;
 
-            _mint(msg.sender, tokenId);
-            transferFrom(msg.sender, receiver, tokenId);
+            _mint(receiver, tokenId);
+            // transferFrom(msg.sender, receiver, tokenId);
         }
 
     }
