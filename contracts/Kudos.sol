@@ -8,7 +8,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         string name;
         string description;         // move to metadata in IPFS?
         uint256 rarity;
-        uint256 price;              // price in finney
+        uint256 priceFinney;              // price in finney
         uint256 numClonesAllowed;
         uint256 numClonesInWild;
         string tags;                // move to metadata in IPFS?
@@ -26,14 +26,14 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
 
     mapping(string => uint256) internal nameToTokenId;
 
-    function mint(string name, string description, uint256 rarity, uint256 price, uint256 numClonesAllowed, string tags, string image) public payable onlyOwner returns (uint256 tokenId) {
+    function mint(string name, string description, uint256 rarity, uint256 priceFinney, uint256 numClonesAllowed, string tags, string image) public payable onlyOwner returns (uint256 tokenId) {
         // Ensure that each Gen0 Kudos is unique
         require(nameToTokenId[name] == 0);
         uint256 _numClonesInWild = 0;
         uint256 _clonedFromId = 0;
 
         Kudo memory _kudo = Kudo({name: name, description: description, rarity: rarity,
-                                  price: price, numClonesAllowed: numClonesAllowed,
+                                  priceFinney: priceFinney, numClonesAllowed: numClonesAllowed,
                                   numClonesInWild: _numClonesInWild,
                                   tags: tags, image: image, clonedFromId: _clonedFromId,
                                   sentFromAddress: msg.sender
@@ -43,7 +43,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
 
         // If the array is new, skip over the first index.
         if(kudos.length == 0) {
-            Kudo memory _dummyKudo = Kudo({name: 'dummy', description: 'dummy', rarity: 0, price: 0,
+            Kudo memory _dummyKudo = Kudo({name: 'dummy', description: 'dummy', rarity: 0, priceFinney: 0,
                                            numClonesAllowed: 0, numClonesInWild: 0,
                                            tags: 'dummy', image: 'dummy', clonedFromId: 0,
                                            sentFromAddress: msg.sender
@@ -75,7 +75,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
             _newKudo.name = _kudo.name;
             _newKudo.description = _kudo.description;
             _newKudo.rarity = _kudo.rarity;
-            _newKudo.price = _kudo.price;
+            _newKudo.priceFinney = _kudo.priceFinney;
             _newKudo.numClonesAllowed = 0;
             _newKudo.numClonesInWild = _kudo.numClonesInWild;
             _newKudo.tags = _kudo.tags;
@@ -107,7 +107,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
             _newKudo.name = _kudo.name;
             _newKudo.description = _kudo.description;
             _newKudo.rarity = _kudo.rarity;
-            _newKudo.price = _kudo.price;
+            _newKudo.priceFinney = _kudo.priceFinney;
             _newKudo.numClonesAllowed = 0;
             _newKudo.numClonesInWild = _kudo.numClonesInWild;
             _newKudo.tags = _kudo.tags;
@@ -141,7 +141,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
 
 
     function getKudosById(uint256 tokenId) view public returns (string name, string description, uint256 rarity,
-                                                                uint256 price, uint256 numClonesAllowed, uint256 numClonesInWild,
+                                                                uint256 priceFinney, uint256 numClonesAllowed, uint256 numClonesInWild,
                                                                 string tags, string image, uint256 clonedFromId, address sentFromAddress)
     {
         Kudo memory _kudo = kudos[tokenId];
@@ -149,7 +149,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         name = _kudo.name;
         description = _kudo.description;
         rarity = _kudo.rarity;
-        price = _kudo.price;
+        priceFinney = _kudo.priceFinney;
         numClonesAllowed = _kudo.numClonesAllowed;
         numClonesInWild = _kudo.numClonesInWild;
         tags = _kudo.tags;
