@@ -63,8 +63,15 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         // Grab existing Kudo blueprint
         uint256 gen0KudosId = nameToTokenId[name];
         Kudo memory _kudo = kudos[gen0KudosId];
-        require(_kudo.numClonesInWild + numClonesRequested <= _kudo.numClonesAllowed);
-        require(msg.value == _kudo.priceFinney * 10**15);
+        require(
+            _kudo.numClonesInWild + numClonesRequested <= _kudo.numClonesAllowed,
+            "The number of Kudos clones requested exceeds the number of clones allowed.");
+        require(
+            msg.value == _kudo.priceFinney * 10**15 * numClonesRequested,
+            "Not enough Wei to pay for the Kudos clones.");
+
+        // Transfer the msg.value to the Gen0 Kudos owner to pay for the Kudos clone(s).
+        ownerOf(gen0KudosId).transfer(msg.value);
 
         // Update original kudo struct in the array
         _kudo.numClonesInWild += numClonesRequested;
@@ -86,7 +93,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
 
             // Note that Solidity uses 0 as a default value when an item is not found in a mapping.
             uint256 tokenId = kudos.push(_newKudo) - 1;
-
+            // Mint the new kudos to the msg.sender's account
             _mint(msg.sender, tokenId);
         }
 
@@ -96,8 +103,15 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         // Grab existing Kudo blueprint
         uint256 gen0KudosId = nameToTokenId[name];
         Kudo memory _kudo = kudos[gen0KudosId];
-        require(_kudo.numClonesInWild + numClonesRequested <= _kudo.numClonesAllowed);
-        require(msg.value == _kudo.priceFinney * 10**15);
+        require(
+            _kudo.numClonesInWild + numClonesRequested <= _kudo.numClonesAllowed,
+            "The number of Kudos clones requested exceeds the number of clones allowed.");
+        require(
+            msg.value == _kudo.priceFinney * 10**15 * numClonesRequested,
+            "Not enough Wei to pay for the Kudos clones.");
+
+        // Transfer the msg.value to the Gen0 Kudos owner to pay for the Kudos clone(s).
+        ownerOf(gen0KudosId).transfer(msg.value);
 
         // Update original kudo struct in the array
         _kudo.numClonesInWild += numClonesRequested;
