@@ -64,6 +64,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         uint256 gen0KudosId = nameToTokenId[name];
         Kudo memory _kudo = kudos[gen0KudosId];
         require(_kudo.numClonesInWild + numClonesRequested <= _kudo.numClonesAllowed);
+        require(msg.value == _kudo.priceFinney * 10^15);
 
         // Update original kudo struct in the array
         _kudo.numClonesInWild += numClonesRequested;
@@ -96,6 +97,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         uint256 gen0KudosId = nameToTokenId[name];
         Kudo memory _kudo = kudos[gen0KudosId];
         require(_kudo.numClonesInWild + numClonesRequested <= _kudo.numClonesAllowed);
+        require(msg.value == _kudo.priceFinney * 10^15);
 
         // Update original kudo struct in the array
         _kudo.numClonesInWild += numClonesRequested;
