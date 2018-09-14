@@ -34,6 +34,7 @@ module.exports = {
       network_id: 3,
       from: '0xd386793f1db5f21609571c0164841e5ea2d33ad8',
       // gas: 5612388
+      // gas: 4612388
     },
     rinkeby: {
       provider: function() {

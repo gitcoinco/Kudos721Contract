@@ -67,7 +67,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
             _kudo.numClonesInWild + numClonesRequested <= _kudo.numClonesAllowed,
             "The number of Kudos clones requested exceeds the number of clones allowed.");
         require(
-            msg.value == _kudo.priceFinney * 10**15 * numClonesRequested,
+            msg.value >= _kudo.priceFinney * 10**15 * numClonesRequested,
             "Not enough Wei to pay for the Kudos clones.");
 
         // Transfer the msg.value to the Gen0 Kudos owner to pay for the Kudos clone(s).
@@ -107,7 +107,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
             _kudo.numClonesInWild + numClonesRequested <= _kudo.numClonesAllowed,
             "The number of Kudos clones requested exceeds the number of clones allowed.");
         require(
-            msg.value == _kudo.priceFinney * 10**15 * numClonesRequested,
+            msg.value >= _kudo.priceFinney * 10**15 * numClonesRequested,
             "Not enough Wei to pay for the Kudos clones.");
 
         // Transfer the msg.value to the Gen0 Kudos owner to pay for the Kudos clone(s).
