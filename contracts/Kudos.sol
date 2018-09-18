@@ -14,7 +14,6 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         string tags;                // move to metadata in IPFS?
         string image;               // IPFS Hash
         uint256 clonedFromId;       // id of gen0 kudos
-        address sentFromAddress;
     }
 
     Kudo[] public kudos;
@@ -35,8 +34,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         Kudo memory _kudo = Kudo({name: name, description: description, rarity: rarity,
                                   priceFinney: priceFinney, numClonesAllowed: numClonesAllowed,
                                   numClonesInWild: _numClonesInWild,
-                                  tags: tags, image: image, clonedFromId: _clonedFromId,
-                                  sentFromAddress: msg.sender
+                                  tags: tags, image: image, clonedFromId: _clonedFromId
                                   });
         // The new kudo is pushed onto the array and minted
         // Note that Solidity uses 0 as a default value when an item is not found in a mapping.
@@ -45,8 +43,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         if(kudos.length == 0) {
             Kudo memory _dummyKudo = Kudo({name: 'dummy', description: 'dummy', rarity: 0, priceFinney: 0,
                                            numClonesAllowed: 0, numClonesInWild: 0,
-                                           tags: 'dummy', image: 'dummy', clonedFromId: 0,
-                                           sentFromAddress: msg.sender
+                                           tags: 'dummy', image: 'dummy', clonedFromId: 0
                                            });
             kudos.push(_dummyKudo);
         }
@@ -89,7 +86,6 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
             _newKudo.tags = _kudo.tags;
             _newKudo.image = _kudo.image;
             _newKudo.clonedFromId = gen0KudosId;
-            _newKudo.sentFromAddress = msg.sender;
 
             // Note that Solidity uses 0 as a default value when an item is not found in a mapping.
             uint256 tokenId = kudos.push(_newKudo) - 1;
@@ -129,7 +125,6 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
             _newKudo.tags = _kudo.tags;
             _newKudo.image = _kudo.image;
             _newKudo.clonedFromId = gen0KudosId;
-            _newKudo.sentFromAddress = msg.sender;
 
             // Note that Solidity uses 0 as a default value when an item is not found in a mapping.
             uint256 tokenId = kudos.push(_newKudo) - 1;
@@ -158,7 +153,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
 
     function getKudosById(uint256 tokenId) view public returns (string name, string description, uint256 rarity,
                                                                 uint256 priceFinney, uint256 numClonesAllowed, uint256 numClonesInWild,
-                                                                string tags, string image, uint256 clonedFromId, address sentFromAddress)
+                                                                string tags, string image, uint256 clonedFromId)
     {
         Kudo memory _kudo = kudos[tokenId];
 
@@ -171,7 +166,6 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         tags = _kudo.tags;
         image = _kudo.image;
         clonedFromId = _kudo.clonedFromId;
-        sentFromAddress = _kudo.sentFromAddress;
     }
 
 
