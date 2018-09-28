@@ -1,0 +1,11 @@
+{
+  "name": "Pythonista",
+  "image": "http://kudosdemo.gitcoin.co/static/v2/images/kudos/pythonista.svg", 
+  "description": "Pythonistas are loyal users of the Python programming language.", 
+  "attributes": {
+    "tags": "python, pythonista",
+    "rarity": 40,
+  },
+  "external_url": "https://kudosdemo.gitcoin.co/kudos", 
+  "background_color": "00FFFF"
+}
