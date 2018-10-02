@@ -8,49 +8,42 @@ import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
 /// @notice Kudos ERC721 interface for minting, cloning, and transferring Kudos tokens.
 contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable { 
     struct Kudo {
-        string name;
-        string description;
-        uint256 rarity;
+        // string name;
+        // string description;
+        // uint256 rarity;
         uint256 priceFinney;
         uint256 numClonesAllowed;
         uint256 numClonesInWild;
-        string tags;
-        string image;
+        // string tags;
+        // string image;
         uint256 clonedFromId;
     }
 
     Kudo[] public kudos;
 
-    mapping(string => uint256) internal nameToTokenId;
+    // mapping(string => uint256) internal nameToTokenId;
 
     /// @dev mint(): Mint a new Gen0 Kudos.  These are the tokens that other Kudos will be "cloned from".
-    /// @param name The name of the new Kudos to mint.  Should be lowercase_with_underscores.
-    /// @param description Description of the Kudos.
-    /// @param rarity Rarity score of the Kudos, from 0 to 100.  May be deprecated in the future.
-    /// @param priceFinney Price of the Kudos in Finney.
-    /// @param numClonesAllowed Maximum number of times this Kudos is allowed to be cloned.
-    /// @param tags Comma delimited tags for the Kudos.
-    /// @param image Image file name.  Such as pythonista.svg.
+    /// @param _priceFinney Price of the Kudos in Finney.
+    /// @param _numClonesAllowed Maximum number of times this Kudos is allowed to be cloned.
+    /// @param _tokenURI A URL to the JSON file containing the metadata for the Kudos.  See metadata.json for an example.
     /// @return the tokenId of the Kudos that has been minted.  Note that in a transaction only the tx_hash is returned.
-    function mint(string name, string description, uint256 rarity, uint256 priceFinney, uint256 numClonesAllowed, string tags, string image) public payable onlyOwner returns (uint256 tokenId) {
+    function mint(uint256 _priceFinney, uint256 _numClonesAllowed, string _tokenURI) public payable onlyOwner returns (uint256 tokenId) {
         // Ensure that each Gen0 Kudos is unique
-        require(nameToTokenId[name] == 0);
+        // require(nameToTokenId[name] == 0);
         uint256 _numClonesInWild = 0;
         uint256 _clonedFromId = 0;
 
-        Kudo memory _kudo = Kudo({name: name, description: description, rarity: rarity,
-                                  priceFinney: priceFinney, numClonesAllowed: numClonesAllowed,
-                                  numClonesInWild: _numClonesInWild,
-                                  tags: tags, image: image, clonedFromId: _clonedFromId
+        Kudo memory _kudo = Kudo({priceFinney: _priceFinney, numClonesAllowed: _numClonesAllowed,
+                                  numClonesInWild: _numClonesInWild, clonedFromId: _clonedFromId
                                   });
         // The new kudo is pushed onto the array and minted
         // Note that Solidity uses 0 as a default value when an item is not found in a mapping.
 
         // If the array is new, skip over the first index.
         if(kudos.length == 0) {
-            Kudo memory _dummyKudo = Kudo({name: 'dummy', description: 'dummy', rarity: 0, priceFinney: 0,
-                                           numClonesAllowed: 0, numClonesInWild: 0,
-                                           tags: 'dummy', image: 'dummy', clonedFromId: 0
+            Kudo memory _dummyKudo = Kudo({priceFinney: 0,numClonesAllowed: 0, numClonesInWild: 0,
+                                           clonedFromId: 0
                                            });
             kudos.push(_dummyKudo);
         }
@@ -58,141 +51,131 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         kudos[tokenId].clonedFromId = tokenId;
 
         _mint(msg.sender, tokenId);
+        _setTokenURI(tokenId, _tokenURI);
 
-        nameToTokenId[name] = tokenId;
+        // nameToTokenId[name] = tokenId;
     }
 
     /// @dev clone(): Clone a new Kudos from a Gen0 Kudos.
-    /// @param name The name of the new Kudos to mint.  Should be lowercase_with_underscores.
-    /// @param numClonesRequested Number of clones to generate.
-    function clone(string name, uint256 numClonesRequested) public payable {
+    /// @param _tokenId The token id of the Kudos to clone and transfer.
+    /// @param _numClonesRequested Number of clones to generate.
+    function clone(uint256 _tokenId, uint256 _numClonesRequested) public payable {
         // Grab existing Kudo blueprint
-        uint256 gen0KudosId = nameToTokenId[name];
-        Kudo memory _kudo = kudos[gen0KudosId];
+        // uint256 gen0KudosId = nameToTokenId[name];
+        Kudo memory _kudo = kudos[_tokenId];
         require(
-            _kudo.numClonesInWild + numClonesRequested <= _kudo.numClonesAllowed,
+            _kudo.numClonesInWild + _numClonesRequested <= _kudo.numClonesAllowed,
             "The number of Kudos clones requested exceeds the number of clones allowed.");
         require(
-            msg.value >= _kudo.priceFinney * 10**15 * numClonesRequested,
+            msg.value >= _kudo.priceFinney * 10**15 * _numClonesRequested,
             "Not enough Wei to pay for the Kudos clones.");
 
         // Transfer the msg.value to the Gen0 Kudos owner to pay for the Kudos clone(s).
-        ownerOf(gen0KudosId).transfer(msg.value);
+        ownerOf(_tokenId).transfer(msg.value);
 
         // Update original kudo struct in the array
-        _kudo.numClonesInWild += numClonesRequested;
-        kudos[gen0KudosId] = _kudo;
+        _kudo.numClonesInWild += _numClonesRequested;
+        kudos[_tokenId] = _kudo;
 
         // Create new kudo, don't let it be cloned
-        for (uint i = 0; i < numClonesRequested; i++) {
+        for (uint i = 0; i < _numClonesRequested; i++) {
             Kudo memory _newKudo;
-            _newKudo.name = _kudo.name;
-            _newKudo.description = _kudo.description;
-            _newKudo.rarity = _kudo.rarity;
             _newKudo.priceFinney = _kudo.priceFinney;
             _newKudo.numClonesAllowed = 0;
             _newKudo.numClonesInWild = 0;
-            _newKudo.tags = _kudo.tags;
-            _newKudo.image = _kudo.image;
-            _newKudo.clonedFromId = gen0KudosId;
+            _newKudo.clonedFromId = _tokenId;
 
             // Note that Solidity uses 0 as a default value when an item is not found in a mapping.
-            uint256 tokenId = kudos.push(_newKudo) - 1;
+            uint256 newTokenId = kudos.push(_newKudo) - 1;
+
             // Mint the new kudos to the msg.sender's account
-            _mint(msg.sender, tokenId);
+            _mint(msg.sender, newTokenId);
+
+            // Use the same tokenURI metadata from the Gen0 Kudos
+            string memory _tokenURI = tokenURI(_tokenId);
+            _setTokenURI(newTokenId, _tokenURI);
         }
     }
 
     /// @dev cloneAndTransfer(): Clone a new Kudos and then transfer it to a different address.
-    /// @param name The name of the new Kudos to mint.  Should be lowercase_with_underscores.
-    /// @param numClonesRequested Number of clones to generate.
-    /// @param receiver The address to transfer the Kudos to after it's cloned.
-    function cloneAndTransfer(string name, uint256 numClonesRequested, address receiver) public payable {
+    /// @param _tokenId The token id of the Kudos to clone and transfer.
+    /// @param _numClonesRequested Number of clones to generate.
+    /// @param _receiver The address to transfer the Kudos to after it's cloned.
+    function cloneAndTransfer(uint256 _tokenId, uint256 _numClonesRequested, address _receiver) public payable {
         // Grab existing Kudo blueprint
-        uint256 gen0KudosId = nameToTokenId[name];
-        Kudo memory _kudo = kudos[gen0KudosId];
+        // uint256 gen0KudosId = nameToTokenId[name];
+        Kudo memory _kudo = kudos[_tokenId];
         require(
-            _kudo.numClonesInWild + numClonesRequested <= _kudo.numClonesAllowed,
+            _kudo.numClonesInWild + _numClonesRequested <= _kudo.numClonesAllowed,
             "The number of Kudos clones requested exceeds the number of clones allowed.");
         require(
-            msg.value >= _kudo.priceFinney * 10**15 * numClonesRequested,
+            msg.value >= _kudo.priceFinney * 10**15 * _numClonesRequested,
             "Not enough Wei to pay for the Kudos clones.");
 
         // Transfer the msg.value to the Gen0 Kudos owner to pay for the Kudos clone(s).
-        ownerOf(gen0KudosId).transfer(msg.value);
+        ownerOf(_tokenId).transfer(msg.value);
 
         // Update original kudo struct in the array
-        _kudo.numClonesInWild += numClonesRequested;
-        kudos[gen0KudosId] = _kudo;
+        _kudo.numClonesInWild += _numClonesRequested;
+        kudos[_tokenId] = _kudo;
 
         // Create new kudo, don't let it be cloned
-        for (uint i = 0; i < numClonesRequested; i++) {
+        for (uint i = 0; i < _numClonesRequested; i++) {
             Kudo memory _newKudo;
-            _newKudo.name = _kudo.name;
-            _newKudo.description = _kudo.description;
-            _newKudo.rarity = _kudo.rarity;
             _newKudo.priceFinney = _kudo.priceFinney;
             _newKudo.numClonesAllowed = 0;
             _newKudo.numClonesInWild = 0;
-            _newKudo.tags = _kudo.tags;
-            _newKudo.image = _kudo.image;
-            _newKudo.clonedFromId = gen0KudosId;
+            _newKudo.clonedFromId = _tokenId;
 
             // Note that Solidity uses 0 as a default value when an item is not found in a mapping.
-            uint256 tokenId = kudos.push(_newKudo) - 1;
+            uint256 newTokenId = kudos.push(_newKudo) - 1;
 
-            _mint(receiver, tokenId);
+            _mint(_receiver, newTokenId);
+
+            // Use the same tokenURI metadata from the Gen0 Kudos
+            string memory _tokenURI = tokenURI(_tokenId);
+            _setTokenURI(newTokenId, _tokenURI);
         }
     }
 
-    /// @dev burnGen0(): Burn a Gen0 Kudos token.  Can only be performed by the owner of the token.
-    /// @param owner The owner address of the token to burn.
-    /// TODO:  Do we need to pay the owner or can we use the ``ownerOf()` function?
-    /// @param tokenId The Kudos ID to be burned.
-    function burnGen0(address owner, uint256 tokenId) public payable onlyOwner {
-        Kudo memory _kudo = kudos[tokenId];
-        delete nameToTokenId[_kudo.name];
-        _burn(owner, tokenId);
-    }
-
     /// @dev burn(): Burn Kudos token.
-    /// @param owner The owner address of the token to burn.
+    /// @param _owner The owner address of the token to burn.
     /// TODO:  Do we need to pay the owner or can we use the ``ownerOf()` function?
-    /// @param tokenId The Kudos ID to be burned.
-    function burn(address owner, uint256 tokenId) public payable {
-        Kudo memory _kudo = kudos[tokenId];
-        uint256 gen0Id = nameToTokenId[_kudo.name];
+    /// @param _tokenId The Kudos ID to be burned.
+    function burn(address _owner, uint256 _tokenId) public payable onlyOwner {
+        Kudo memory _kudo = kudos[_tokenId];
+        uint256 gen0Id = _kudo.clonedFromId;
         Kudo memory _gen0Kudo = kudos[gen0Id];
         _gen0Kudo.numClonesInWild -= 1;
         kudos[gen0Id] = _gen0Kudo;
-        _burn(owner, tokenId);
+        _burn(_owner, _tokenId);
     }
 
     /// @dev getKudosById(): Return a Kudos struct/array given a Kudos Id. 
-    /// @param tokenId The Kudos Id.
+    /// @param _tokenId The Kudos Id.
     /// @return the Kudos struct, in array form.
-    function getKudosById(uint256 tokenId) view public returns (string name, string description, uint256 rarity,
-                                                                uint256 priceFinney, uint256 numClonesAllowed, uint256 numClonesInWild,
-                                                                string tags, string image, uint256 clonedFromId)
+    function getKudosById(uint256 _tokenId) view public returns (uint256 priceFinney,
+                                                                uint256 numClonesAllowed,
+                                                                uint256 numClonesInWild,
+                                                                uint256 clonedFromId
+                                                                )
     {
-        Kudo memory _kudo = kudos[tokenId];
+        Kudo memory _kudo = kudos[_tokenId];
 
-        name = _kudo.name;
-        description = _kudo.description;
-        rarity = _kudo.rarity;
         priceFinney = _kudo.priceFinney;
         numClonesAllowed = _kudo.numClonesAllowed;
         numClonesInWild = _kudo.numClonesInWild;
-        tags = _kudo.tags;
-        image = _kudo.image;
         clonedFromId = _kudo.clonedFromId;
     }
 
-    /// @dev getGen0TokenId(): Get the Gen0 Kudos Id.
-    /// @param name The name Gen0 Kudos.
-    /// @return Kudos Id.
-    function getGen0TokenId(string name) view public returns (uint256) {
-        // If the result is 0 it means the key was not found in the mapping.
-        return nameToTokenId[name];
+    /// @dev updatePrice(): Update the Kudos listing price.
+    /// @param _tokenId The Kudos Id.
+    /// @param _newPriceFinney The new price of the Kudos.
+    /// @return the Kudos struct, in array form.
+    function updatePrice(uint256 _tokenId, uint256 _newPriceFinney) public onlyOwner {
+        Kudo memory _kudo = kudos[_tokenId];
+
+        _kudo.priceFinney = _newPriceFinney;
+        kudos[_tokenId] = _kudo;
     }
 }
