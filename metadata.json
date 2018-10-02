@@ -1,11 +1,22 @@
 {
-  "name": "Pythonista",
+	"name": "Pythonista",
   "image": "http://kudosdemo.gitcoin.co/static/v2/images/kudos/pythonista.svg", 
   "description": "Pythonistas are loyal users of the Python programming language.", 
-  "attributes": {
-    "tags": "python, pythonista",
-    "rarity": 40,
-  },
-  "external_url": "https://kudosdemo.gitcoin.co/kudos", 
-  "background_color": "00FFFF"
+  "attributes": [
+    {
+      "trait_type": "rarity",
+      "value": 40,
+      "max_value": 100
+    },
+    {
+      "trait_type": "tag",
+      "value": "python"
+    },
+    {
+      "trait_type": "tag",
+      "value": "pythonista"
+    }
+  ],
+  "external_url": "http://kudosdemo.gitcoin.co/kudos/48/pythonista",
+  "background_color": "#fbfbfb"
 }
