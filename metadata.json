@@ -1,7 +1,7 @@
 {
-	"name": "Pythonista",
-  "image": "http://kudosdemo.gitcoin.co/static/v2/images/kudos/pythonista.svg", 
-  "description": "Pythonistas are loyal users of the Python programming language.", 
+  "name": "Pythonista",
+  "image": "http://kudosdemo.gitcoin.co/static/v2/images/kudos/pythonista.svg",
+  "description": "Pythonistas are loyal users of the Python programming language.",
   "attributes": [
     {
       "trait_type": "rarity",
