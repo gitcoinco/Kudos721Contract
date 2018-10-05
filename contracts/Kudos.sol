@@ -168,6 +168,16 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         clonedFromId = _kudo.clonedFromId;
     }
 
+    /// @dev getNumClonesInWild(): Return a Kudos struct/array given a Kudos Id. 
+    /// @param _tokenId The Kudos Id.
+    /// @return the number of cloes in the wild
+    function getNumClonesInWild(uint256 _tokenId) view public returns (uint256 numClonesInWild)
+    {
+        Kudo memory _kudo = kudos[_tokenId];
+
+        numClonesInWild = _kudo.numClonesInWild;
+    }
+
     /// @dev updatePrice(): Update the Kudos listing price.
     /// @param _tokenId The Kudos Id.
     /// @param _newPriceFinney The new price of the Kudos.
