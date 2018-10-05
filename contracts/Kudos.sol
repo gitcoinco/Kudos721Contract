@@ -6,7 +6,7 @@ import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
 /// @title Kudos
 /// @author Jason Haas <jasonrhaas@gmail.com>
 /// @notice Kudos ERC721 interface for minting, cloning, and transferring Kudos tokens.
-contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable { 
+contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
     struct Kudo {
         // string name;
         // string description;
@@ -63,15 +63,16 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         // Grab existing Kudo blueprint
         // uint256 gen0KudosId = nameToTokenId[name];
         Kudo memory _kudo = kudos[_tokenId];
+        uint256 cloningCost  = _kudo.priceFinney * 10**15 * _numClonesRequested;
         require(
             _kudo.numClonesInWild + _numClonesRequested <= _kudo.numClonesAllowed,
             "The number of Kudos clones requested exceeds the number of clones allowed.");
         require(
-            msg.value >= _kudo.priceFinney * 10**15 * _numClonesRequested,
+            msg.value >= cloningCost,
             "Not enough Wei to pay for the Kudos clones.");
 
-        // Transfer the msg.value to the Gen0 Kudos owner to pay for the Kudos clone(s).
-        ownerOf(_tokenId).transfer(msg.value);
+        // Transfer the minting price to the Gen0 Kudos owner to pay for the Kudos clone(s).
+        ownerOf(_tokenId).transfer(cloningCost);
 
         // Update original kudo struct in the array
         _kudo.numClonesInWild += _numClonesRequested;
@@ -105,15 +106,16 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         // Grab existing Kudo blueprint
         // uint256 gen0KudosId = nameToTokenId[name];
         Kudo memory _kudo = kudos[_tokenId];
+        uint256 cloningCost  = _kudo.priceFinney * 10**15 * _numClonesRequested;
         require(
             _kudo.numClonesInWild + _numClonesRequested <= _kudo.numClonesAllowed,
             "The number of Kudos clones requested exceeds the number of clones allowed.");
         require(
-            msg.value >= _kudo.priceFinney * 10**15 * _numClonesRequested,
+            msg.value >= cloningCost,
             "Not enough Wei to pay for the Kudos clones.");
 
-        // Transfer the msg.value to the Gen0 Kudos owner to pay for the Kudos clone(s).
-        ownerOf(_tokenId).transfer(msg.value);
+        // Transfer the minting price to the Gen0 Kudos owner to pay for the Kudos clone(s).
+        ownerOf(_tokenId).transfer(cloningCost);
 
         // Update original kudo struct in the array
         _kudo.numClonesInWild += _numClonesRequested;
@@ -145,9 +147,11 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
     function burn(address _owner, uint256 _tokenId) public payable onlyOwner {
         Kudo memory _kudo = kudos[_tokenId];
         uint256 gen0Id = _kudo.clonedFromId;
-        Kudo memory _gen0Kudo = kudos[gen0Id];
-        _gen0Kudo.numClonesInWild -= 1;
-        kudos[gen0Id] = _gen0Kudo;
+        if (_tokenId != gen0Id) {
+            Kudo memory _gen0Kudo = kudos[gen0Id];
+            _gen0Kudo.numClonesInWild -= 1;
+            kudos[gen0Id] = _gen0Kudo;
+        }
         _burn(_owner, _tokenId);
     }
 
