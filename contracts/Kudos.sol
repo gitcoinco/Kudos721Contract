@@ -24,11 +24,12 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
     // mapping(string => uint256) internal nameToTokenId;
 
     /// @dev mint(): Mint a new Gen0 Kudos.  These are the tokens that other Kudos will be "cloned from".
+    /// @param _to Address to mint to.
     /// @param _priceFinney Price of the Kudos in Finney.
     /// @param _numClonesAllowed Maximum number of times this Kudos is allowed to be cloned.
     /// @param _tokenURI A URL to the JSON file containing the metadata for the Kudos.  See metadata.json for an example.
     /// @return the tokenId of the Kudos that has been minted.  Note that in a transaction only the tx_hash is returned.
-    function mint(uint256 _priceFinney, uint256 _numClonesAllowed, string _tokenURI) public payable onlyOwner returns (uint256 tokenId) {
+    function mint(address _to, uint256 _priceFinney, uint256 _numClonesAllowed, string _tokenURI) public payable onlyOwner returns (uint256 tokenId) {
         // Ensure that each Gen0 Kudos is unique
         // require(nameToTokenId[name] == 0);
         uint256 _numClonesInWild = 0;
@@ -50,7 +51,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         tokenId = kudos.push(_kudo) - 1;
         kudos[tokenId].clonedFromId = tokenId;
 
-        _mint(msg.sender, tokenId);
+        _mint(_to, tokenId);
         _setTokenURI(tokenId, _tokenURI);
 
         // nameToTokenId[name] = tokenId;
