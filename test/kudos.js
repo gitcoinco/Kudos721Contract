@@ -1,33 +1,19 @@
 const Kudos = artifacts.require("Kudos");
 
-// TODO:  Right now each test is dependent on each other because of the numClonesInWild
-//        Would be better if they were completely independent of one another
 contract("KudosTest", async(accounts) => {
-  let instance;
   let priceFinney = 2;
   let numClonesAllowed = 10;
   let tokenURI = 'http://example.com';
-  let kudos_id;
 
   let gasPrice = web3.eth.gasPrice;
 
-  beforeEach("setup contract and mint a kudos", async () => {
-    instance = await Kudos.deployed();
-    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
-    kudos_id = await instance.totalSupply();
-    kudos_id = kudos_id.toNumber();
-    let kudos = (await instance.getKudosById(kudos_id)).map(x => x.toNumber());
-    // console.log(kudos_id)
-    // console.log(kudos)
-  })
-
-  // afterEach("print out the original kudos data", async () => {
-  //   instance = await Kudos.deployed();
-  //   let kudos = (await instance.getKudosById(kudos_id)).map(x => x.toNumber());
-  //   console.log(kudos)
-  // })
-
   it("should mint a new kudos", async () => {
+    // Mint a new Gen0 Kudos
+    // TODO: This block is repeated for each test.  Should be able to use the beforeEach hook,
+    // but there was some issues with variables from one test polluting the other.
+    let instance = await Kudos.deployed();
+    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    let kudos_id = (await instance.totalSupply()).toNumber();
 
     let kudos = (await instance.getKudosById(kudos_id)).map(x => x.toNumber());
     let expected_kudos = [priceFinney, numClonesAllowed, 0, kudos_id];
@@ -35,8 +21,12 @@ contract("KudosTest", async(accounts) => {
     assert.equal(await instance.tokenURI(kudos_id), tokenURI);
   });
 
-    // let owner = await instance.ownerOf(kudos_id);
   it("should clone the kudos, given the proper amount of ETH", async () => {
+    // Mint a new Gen0 Kudos
+    let instance = await Kudos.deployed();
+    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    let kudos_id = (await instance.totalSupply()).toNumber();
+
     let numClones = 1;
     let originalBalance = web3.eth.getBalance(accounts[0]);
     await instance.clone(kudos_id, numClones, {"from": accounts[1], "value": web3.toWei(priceFinney, 'finney')});
@@ -65,6 +55,11 @@ contract("KudosTest", async(accounts) => {
   });
 
   it("should do a cloneAndTransfer of the original kudos, given the proper amount of ETH", async () => {
+    // Mint a new Gen0 Kudos
+    let instance = await Kudos.deployed();
+    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    let kudos_id = (await instance.totalSupply()).toNumber();
+
     let numClones = 1;
     let originalBalance = web3.eth.getBalance(accounts[0]);
     await instance.cloneAndTransfer(kudos_id, numClones, accounts[2], {"from": accounts[1], "value": web3.toWei(priceFinney, 'finney')});
@@ -93,6 +88,11 @@ contract("KudosTest", async(accounts) => {
   });
 
   it("should update the priceFinney of the kudos", async () => {
+    // Mint a new Gen0 Kudos
+    let instance = await Kudos.deployed();
+    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    let kudos_id = (await instance.totalSupply()).toNumber();
+
     let newPriceFinney = 5;
     await instance.updatePrice(kudos_id, newPriceFinney);
     let kudos = (await instance.getKudosById(kudos_id)).map(x => x.toNumber());
@@ -100,6 +100,11 @@ contract("KudosTest", async(accounts) => {
   });
 
   it("should make 5 clones at once", async () => {
+    // Mint a new Gen0 Kudos
+    let instance = await Kudos.deployed();
+    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    let kudos_id = (await instance.totalSupply()).toNumber();
+
     let startSupply = (await instance.totalSupply()).toNumber();
     let originalBalance = web3.eth.getBalance(accounts[0]);
     let numClones = 5;
@@ -117,18 +122,20 @@ contract("KudosTest", async(accounts) => {
   });
 
   it("should burn the kudos token", async () => {
+    // Mint a new Gen0 Kudos
+    let instance = await Kudos.deployed();
+    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    let kudos_id = (await instance.totalSupply()).toNumber();
+
     let numClones = 1;
     let startSupply = (await instance.totalSupply()).toNumber();
-    // console.log((await instance.totalSupply()).toNumber())
     await instance.clone(kudos_id, numClones, {"from": accounts[3], "value": web3.toWei(priceFinney, 'finney')});
     // Balance of account[3] should be 1
     assert.equal(await instance.balanceOf(accounts[3]), 1)
-    // console.log((await instance.totalSupply()).toNumber())
 
     // Burn the new clone
     let clone_id = (await instance.totalSupply()).toNumber();
     await instance.burn(accounts[3], clone_id);
-    // console.log((await instance.totalSupply()).toNumber())
 
     // Balance of account[3] should be 0
     assert.equal(await instance.balanceOf(accounts[3]), 0)
@@ -143,6 +150,11 @@ contract("KudosTest", async(accounts) => {
   });
 
   it("should fail when trying to clone a kudos without enough ETH in msg.value", async () => {
+    // Mint a new Gen0 Kudos
+    let instance = await Kudos.deployed();
+    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    let kudos_id = (await instance.totalSupply()).toNumber();
+
     let numClones = 1;
     try {
       await instance.clone(kudos_id, numClones, {"from": accounts[0], "value": web3.toWei(priceFinney - 1, 'finney')});
@@ -153,6 +165,11 @@ contract("KudosTest", async(accounts) => {
   });
 
   it("should fail when trying to cloneAndTransfer a kudos without enough ETH in msg.value", async () => {
+    // Mint a new Gen0 Kudos
+    let instance = await Kudos.deployed();
+    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    let kudos_id = (await instance.totalSupply()).toNumber();
+
     let numClones = 1;
     try {
       await instance.cloneAndTransfer(kudos_id, numClones, accounts[1], {"from": accounts[0], "value": web3.toWei(priceFinney - 1, 'finney')});
@@ -163,6 +180,11 @@ contract("KudosTest", async(accounts) => {
   });
 
   it("should fail when trying to make too many clones", async () => {
+    // Mint a new Gen0 Kudos
+    let instance = await Kudos.deployed();
+    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    let kudos_id = (await instance.totalSupply()).toNumber();
+
     let numClones = 100;
     try {
       await instance.clone(kudos_id, numClones, {"from": accounts[1], "value": web3.toWei(priceFinney, 'finney')});
@@ -173,6 +195,11 @@ contract("KudosTest", async(accounts) => {
   });
 
   it("should not be able to clone a clone", async () => {
+    // Mint a new Gen0 Kudos
+    let instance = await Kudos.deployed();
+    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    let kudos_id = (await instance.totalSupply()).toNumber();
+
     let numClones = 1;
     await instance.clone(kudos_id, numClones, {"from": accounts[1], "value": web3.toWei(priceFinney, 'finney')});
     let cloned_id = (await instance.totalSupply()).toNumber();
@@ -184,14 +211,13 @@ contract("KudosTest", async(accounts) => {
     }
   })
 
-  // TODO:  Need to figure out what's going on with this test
-  // There is some test polution causing me to have to mint a new Kudos for this test.
-  // Could be somethign with how the `beforeEach` hook is working.
   it("should not be able to cloneAndTransfer a clone", async () => {
-    instance = await Kudos.deployed();
+    // Mint a new Gen0 Kudos
+    let instance = await Kudos.deployed();
+    console.log(numClonesAllowed)
     await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
-    kudos_id = await instance.totalSupply();
-    kudos_id = kudos_id.toNumber();
+    let kudos_id = (await instance.totalSupply()).toNumber() + 1;
+
     let numClones = 1;
     await instance.clone(kudos_id, numClones, {"from": accounts[1], "value": web3.toWei(priceFinney, 'finney')});
     let cloned_id = (await instance.totalSupply()).toNumber();
