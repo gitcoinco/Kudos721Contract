@@ -185,7 +185,13 @@ contract("KudosTest", async(accounts) => {
   })
 
   // TODO:  Need to figure out what's going on with this test
-  it.skip("should not be able to cloneAndTransfer a clone", async () => {
+  // There is some test polution causing me to have to mint a new Kudos for this test.
+  // Could be somethign with how the `beforeEach` hook is working.
+  it("should not be able to cloneAndTransfer a clone", async () => {
+    instance = await Kudos.deployed();
+    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    kudos_id = await instance.totalSupply();
+    kudos_id = kudos_id.toNumber();
     let numClones = 1;
     await instance.clone(kudos_id, numClones, {"from": accounts[1], "value": web3.toWei(priceFinney, 'finney')});
     let cloned_id = (await instance.totalSupply()).toNumber();
