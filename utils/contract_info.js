@@ -3,7 +3,6 @@
 
 const fs = require('fs');
 
-console.log(process.argv);
 item = process.argv[2];
 const contract = JSON.parse(fs.readFileSync('./build/contracts/Kudos.json', 'utf8'));
 console.log(JSON.stringify(contract[item]));
