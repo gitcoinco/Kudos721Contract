@@ -214,7 +214,6 @@ contract("KudosTest", async(accounts) => {
   it("should not be able to cloneAndTransfer a clone", async () => {
     // Mint a new Gen0 Kudos
     let instance = await Kudos.deployed();
-    console.log(numClonesAllowed)
     await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
     let kudos_id = (await instance.totalSupply()).toNumber() + 1;
 
