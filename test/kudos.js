@@ -5,26 +5,42 @@ contract("KudosTest", async(accounts) => {
   let numClonesAllowed = 10;
   let tokenURI = 'http://example.com';
 
+  let mintAddress = accounts[0];
+
   let gasPrice = web3.eth.gasPrice;
 
-  it("should mint a new kudos", async () => {
+  it("should mint a new kudos to a different address", async () => {
     // Mint a new Gen0 Kudos
     // TODO: This block is repeated for each test.  Should be able to use the beforeEach hook,
     // but there was some issues with variables from one test polluting the other.
     let instance = await Kudos.deployed();
-    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    await instance.mint(accounts[1], priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
     let kudos_id = (await instance.totalSupply()).toNumber();
 
     let kudos = (await instance.getKudosById(kudos_id)).map(x => x.toNumber());
     let expected_kudos = [priceFinney, numClonesAllowed, 0, kudos_id];
     assert.deepEqual(kudos, expected_kudos);
     assert.equal(await instance.tokenURI(kudos_id), tokenURI);
+    assert.equal(await instance.ownerOf(kudos_id), accounts[1]);
+  });
+
+  it("should not allow minting if not contract owner", async () => {
+    // Mint a new Gen0 Kudos
+    // accounts[0] is the contract owner, so accounts[1] should not be able to mint
+    let instance = await Kudos.deployed();
+
+    try {
+      await instance.mint(accounts[1], priceFinney, numClonesAllowed, tokenURI, {"from": accounts[1]});
+      assert.fail();
+    } catch (err) {
+      assert.ok(err);
+    }
   });
 
   it("should clone the kudos, given the proper amount of ETH", async () => {
     // Mint a new Gen0 Kudos
     let instance = await Kudos.deployed();
-    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
     let kudos_id = (await instance.totalSupply()).toNumber();
 
     let numClones = 1;
@@ -57,7 +73,7 @@ contract("KudosTest", async(accounts) => {
   it("should do a cloneAndTransfer of the original kudos, given the proper amount of ETH", async () => {
     // Mint a new Gen0 Kudos
     let instance = await Kudos.deployed();
-    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
     let kudos_id = (await instance.totalSupply()).toNumber();
 
     let numClones = 1;
@@ -90,7 +106,7 @@ contract("KudosTest", async(accounts) => {
   it("should update the priceFinney of the kudos", async () => {
     // Mint a new Gen0 Kudos
     let instance = await Kudos.deployed();
-    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
     let kudos_id = (await instance.totalSupply()).toNumber();
 
     let newPriceFinney = 5;
@@ -102,7 +118,7 @@ contract("KudosTest", async(accounts) => {
   it("should make 5 clones at once", async () => {
     // Mint a new Gen0 Kudos
     let instance = await Kudos.deployed();
-    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
     let kudos_id = (await instance.totalSupply()).toNumber();
 
     let startSupply = (await instance.totalSupply()).toNumber();
@@ -124,7 +140,7 @@ contract("KudosTest", async(accounts) => {
   it("should burn the kudos token", async () => {
     // Mint a new Gen0 Kudos
     let instance = await Kudos.deployed();
-    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
     let kudos_id = (await instance.totalSupply()).toNumber();
 
     let numClones = 1;
@@ -152,7 +168,7 @@ contract("KudosTest", async(accounts) => {
   it("should fail when trying to clone a kudos without enough ETH in msg.value", async () => {
     // Mint a new Gen0 Kudos
     let instance = await Kudos.deployed();
-    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
     let kudos_id = (await instance.totalSupply()).toNumber();
 
     let numClones = 1;
@@ -167,7 +183,7 @@ contract("KudosTest", async(accounts) => {
   it("should fail when trying to cloneAndTransfer a kudos without enough ETH in msg.value", async () => {
     // Mint a new Gen0 Kudos
     let instance = await Kudos.deployed();
-    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
     let kudos_id = (await instance.totalSupply()).toNumber();
 
     let numClones = 1;
@@ -182,7 +198,7 @@ contract("KudosTest", async(accounts) => {
   it("should fail when trying to make too many clones", async () => {
     // Mint a new Gen0 Kudos
     let instance = await Kudos.deployed();
-    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
     let kudos_id = (await instance.totalSupply()).toNumber();
 
     let numClones = 100;
@@ -197,7 +213,7 @@ contract("KudosTest", async(accounts) => {
   it("should not be able to clone a clone", async () => {
     // Mint a new Gen0 Kudos
     let instance = await Kudos.deployed();
-    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
     let kudos_id = (await instance.totalSupply()).toNumber();
 
     let numClones = 1;
@@ -214,7 +230,7 @@ contract("KudosTest", async(accounts) => {
   it("should not be able to cloneAndTransfer a clone", async () => {
     // Mint a new Gen0 Kudos
     let instance = await Kudos.deployed();
-    await instance.mint(priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
     let kudos_id = (await instance.totalSupply()).toNumber() + 1;
 
     let numClones = 1;
