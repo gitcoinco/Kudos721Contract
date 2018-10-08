@@ -2,8 +2,7 @@
 node_modules/
 
 # contract builds
-build/contracts/*
-!Kudos.json
+build/*
 
 # mac files
 .DS_Store
