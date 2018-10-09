@@ -2,6 +2,7 @@ const Kudos = artifacts.require("Kudos");
 
 contract("KudosTest", async(accounts) => {
   let priceFinney = 2;
+  let priceWeiBN = web3.toBigNumber(web3.toWei(priceFinney, 'finney'));
   let numClonesAllowed = 10;
   let tokenURI = 'http://example.com';
 
@@ -37,48 +38,27 @@ contract("KudosTest", async(accounts) => {
     }
   });
 
+  it("should allow the contract owner to change the cloneFeePercentage", async () => {
+    // Mint a new Gen0 Kudos
+    let instance = await Kudos.deployed();
+    let newFee = 20;
+    await instance.setCloneFeePercentage(newFee);
+    let fee = await instance.cloneFeePercentage();
+    assert.equal(fee, newFee);
+  });
+
   it("should clone the kudos, given the proper amount of ETH", async () => {
     // Mint a new Gen0 Kudos
     let instance = await Kudos.deployed();
-    await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    // token owner -- accounts[1]
+    // contract owner -- accounts[0]
+    await instance.mint(accounts[1], priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
     let kudos_id = (await instance.totalSupply()).toNumber();
 
     let numClones = 1;
-    let originalBalance = web3.eth.getBalance(accounts[0]);
-    await instance.clone(kudos_id, numClones, {"from": accounts[1], "value": web3.toWei(priceFinney, 'finney')});
-    let cloned_id = (await instance.totalSupply()).toNumber();
-
-    // Check that the cloned_id is what we expect
-    assert.equal(cloned_id, kudos_id + 1);
-
-    // Check that the return kudos matches what we expect
-    let cloned_kudos = (await instance.getKudosById(cloned_id)).map(x => x.toNumber());
-    let expected_cloned_kudos = [priceFinney, 0, 0, kudos_id];
-    assert.deepEqual(cloned_kudos, expected_cloned_kudos);
-
-    // Check that the original kudos numClonesInWild has been updated
-    let numClonesInWild = (await instance.getNumClonesInWild(kudos_id)).toNumber();
-    assert.equal(numClonesInWild, numClones);
-
-    // Check that the owner of the new clone is what we expect
-    let owner = await instance.ownerOf(cloned_id);
-    assert.equal(owner, accounts[1]);
-
-    // Check that funds to mint were transferred over to the original owner
-    let newBalance = web3.eth.getBalance(accounts[0]);
-    let result = (newBalance.minus(originalBalance)).eq(web3.toBigNumber(web3.toWei(priceFinney, 'finney')));
-    assert.ok(result);
-  });
-
-  it("should do a cloneAndTransfer of the original kudos, given the proper amount of ETH", async () => {
-    // Mint a new Gen0 Kudos
-    let instance = await Kudos.deployed();
-    await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
-    let kudos_id = (await instance.totalSupply()).toNumber();
-
-    let numClones = 1;
-    let originalBalance = web3.eth.getBalance(accounts[0]);
-    await instance.cloneAndTransfer(kudos_id, numClones, accounts[2], {"from": accounts[1], "value": web3.toWei(priceFinney, 'finney')});
+    let contractOwnerBalance = web3.eth.getBalance(accounts[0]);
+    let tokenOwnerBalance = web3.eth.getBalance(accounts[1]);
+    await instance.clone(accounts[2], kudos_id, numClones, {"from": accounts[1], "value": web3.toWei(priceFinney, 'finney')});
     let cloned_id = (await instance.totalSupply()).toNumber();
 
     // Check that the cloned_id is what we expect
@@ -97,20 +77,29 @@ contract("KudosTest", async(accounts) => {
     let owner = await instance.ownerOf(cloned_id);
     assert.equal(owner, accounts[2]);
 
-    // Check that funds to mint were transferred over to the original owner
-    let newBalance = web3.eth.getBalance(accounts[0]);
-    let result = (newBalance.minus(originalBalance)).eq(web3.toBigNumber(web3.toWei(priceFinney, 'finney')));
-    assert.ok(result);
+    let feePercentage = await instance.cloneFeePercentage();
+
+    // Check that the cloneFeePercentage went to the contract owner
+    let contractOwnerFee = priceWeiBN.times(feePercentage).div(web3.toBigNumber(100));
+    let newContractOwnerBalance = web3.eth.getBalance(accounts[0]);
+    let ownerFeeCheck = (newContractOwnerBalance.minus(contractOwnerBalance)).eq(contractOwnerFee);
+    assert.ok(ownerFeeCheck);
+
+    // Check that funds to mint were transferred over to the original token owner
+    let tokenOwnerFee = priceWeiBN.minus(contractOwnerFee);
+    let newTokenOwnerBalance = web3.eth.getBalance(accounts[1]);
+    let tokenFeeCheck = (newTokenOwnerBalance.minus(tokenOwnerBalance)).eq(tokenOwnerFee);
+    assert.ok(tokenOwnerFee);
   });
 
-  it("should update the priceFinney of the kudos", async () => {
+  it("should set the priceFinney of the kudos", async () => {
     // Mint a new Gen0 Kudos
     let instance = await Kudos.deployed();
     await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
     let kudos_id = (await instance.totalSupply()).toNumber();
 
     let newPriceFinney = 5;
-    await instance.updatePrice(kudos_id, newPriceFinney);
+    await instance.setPrice(kudos_id, newPriceFinney);
     let kudos = (await instance.getKudosById(kudos_id)).map(x => x.toNumber());
     assert.equal(kudos[0], newPriceFinney);
   });
@@ -125,7 +114,7 @@ contract("KudosTest", async(accounts) => {
     let originalBalance = web3.eth.getBalance(accounts[0]);
     let numClones = 5;
     let msgValue = web3.toWei(priceFinney * numClones, 'finney');
-    await instance.clone(kudos_id, numClones, {"from": accounts[1], "value": msgValue});
+    await instance.clone(accounts[1], kudos_id, numClones, {"from": accounts[1], "value": msgValue});
     let cloned_id = (await instance.totalSupply()).toNumber();
     let endSupply = cloned_id;
 
@@ -145,7 +134,7 @@ contract("KudosTest", async(accounts) => {
 
     let numClones = 1;
     let startSupply = (await instance.totalSupply()).toNumber();
-    await instance.clone(kudos_id, numClones, {"from": accounts[3], "value": web3.toWei(priceFinney, 'finney')});
+    await instance.clone(accounts[3], kudos_id, numClones, {"from": accounts[3], "value": web3.toWei(priceFinney, 'finney')});
     // Balance of account[3] should be 1
     assert.equal(await instance.balanceOf(accounts[3]), 1)
 
@@ -173,22 +162,7 @@ contract("KudosTest", async(accounts) => {
 
     let numClones = 1;
     try {
-      await instance.clone(kudos_id, numClones, {"from": accounts[0], "value": web3.toWei(priceFinney - 1, 'finney')});
-      assert.fail();
-    } catch (err) {
-      assert.ok(err);
-    }
-  });
-
-  it("should fail when trying to cloneAndTransfer a kudos without enough ETH in msg.value", async () => {
-    // Mint a new Gen0 Kudos
-    let instance = await Kudos.deployed();
-    await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
-    let kudos_id = (await instance.totalSupply()).toNumber();
-
-    let numClones = 1;
-    try {
-      await instance.cloneAndTransfer(kudos_id, numClones, accounts[1], {"from": accounts[0], "value": web3.toWei(priceFinney - 1, 'finney')});
+      await instance.clone(accounts[1], kudos_id, numClones, {"from": accounts[1], "value": web3.toWei(priceFinney - 1, 'finney')});
       assert.fail();
     } catch (err) {
       assert.ok(err);
@@ -203,7 +177,7 @@ contract("KudosTest", async(accounts) => {
 
     let numClones = 100;
     try {
-      await instance.clone(kudos_id, numClones, {"from": accounts[1], "value": web3.toWei(priceFinney, 'finney')});
+      await instance.clone(accounts[1], kudos_id, numClones, {"from": accounts[1], "value": web3.toWei(priceFinney, 'finney')});
       assert.fail();
     } catch (err) {
       assert.ok(err);
@@ -217,27 +191,10 @@ contract("KudosTest", async(accounts) => {
     let kudos_id = (await instance.totalSupply()).toNumber();
 
     let numClones = 1;
-    await instance.clone(kudos_id, numClones, {"from": accounts[1], "value": web3.toWei(priceFinney, 'finney')});
+    await instance.clone(accounts[1], kudos_id, numClones, {"from": accounts[1], "value": web3.toWei(priceFinney, 'finney')});
     let cloned_id = (await instance.totalSupply()).toNumber();
     try {
-      await instance.clone(cloned_id, numClones, {"from": accounts[1], "value": web3.toWei(priceFinney, 'finney')});
-      assert.fail();
-    } catch (err) {
-      assert.ok(err);
-    }
-  })
-
-  it("should not be able to cloneAndTransfer a clone", async () => {
-    // Mint a new Gen0 Kudos
-    let instance = await Kudos.deployed();
-    await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
-    let kudos_id = (await instance.totalSupply()).toNumber() + 1;
-
-    let numClones = 1;
-    await instance.clone(kudos_id, numClones, {"from": accounts[1], "value": web3.toWei(priceFinney, 'finney')});
-    let cloned_id = (await instance.totalSupply()).toNumber();
-    try {
-      await instance.cloneAndTransfer(cloned_id, numClones, accounts[2], {"from": accounts[1], "value": web3.toWei(priceFinney, 'finney')});
+      await instance.clone(accounts[1], cloned_id, numClones, {"from": accounts[1], "value": web3.toWei(priceFinney, 'finney')});
       assert.fail();
     } catch (err) {
       assert.ok(err);
