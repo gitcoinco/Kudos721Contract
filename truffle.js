@@ -27,7 +27,10 @@ module.exports = {
         return new HDWalletProviderPriv(privkeys, 'https://mainnet.infura.io/' + token)
       },
       network_id: 1, // Ethereum public network
-      from: '0x6239FF1040E412491557a7a02b2CBcC5aE85dc8F',
+      from: '0x6239ff1040e412491557a7a02b2cbcc5ae85dc8f',
+      gasPrice: 2000000000,
+      // gas: 5612388,
+      // gas: 4612388
       // optional config values
       // host - defaults to "localhost"
       // port - defaults to 8545
