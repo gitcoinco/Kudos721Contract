@@ -11,7 +11,7 @@ if (fs.existsSync('secrets.json')) {
   secrets = JSON.parse(fs.readFileSync('secrets.json', 'utf8'))
   mnemonic = secrets.mnemonic
   token = secrets.token
-  privkeys = secrets.privkeys
+  privkeys = secrets.privKeys
 } else {
   console.log('No secrets.json found. If you are trying to publish EPM ' +
               'this will fail. Otherwise, you can ignore this message!')
