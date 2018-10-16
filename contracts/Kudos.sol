@@ -110,6 +110,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
             _gen0Kudo.numClonesInWild -= 1;
             kudos[gen0Id] = _gen0Kudo;
         }
+        delete kudos[_tokenId];
         _burn(_owner, _tokenId);
     }
 
@@ -159,5 +160,12 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         Kudo memory _kudo = kudos[_tokenId];
 
         numClonesInWild = _kudo.numClonesInWild;
+    }
+
+    /// @dev getLatestId(): Returns the newest Kudos Id in the kudos array.
+    /// @return the latest kudos id.
+    function getLatestId() view public returns (uint256 tokenId)
+    {
+        tokenId = kudos.length - 1;
     }
 }
