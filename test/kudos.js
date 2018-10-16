@@ -130,28 +130,37 @@ contract("KudosTest", async(accounts) => {
     // Mint a new Gen0 Kudos
     let instance = await Kudos.deployed();
     await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
-    let kudos_id = (await instance.totalSupply()).toNumber();
+    let kudos_id = (await instance.getLatestId()).toNumber();
 
     let numClones = 1;
-    let startSupply = (await instance.totalSupply()).toNumber();
     await instance.clone(accounts[3], kudos_id, numClones, {"from": accounts[3], "value": web3.toWei(priceFinney, 'finney')});
+    let startSupply = (await instance.totalSupply()).toNumber();
     // Balance of account[3] should be 1
     assert.equal(await instance.balanceOf(accounts[3]), 1)
 
     // Burn the new clone
-    let clone_id = (await instance.totalSupply()).toNumber();
+    let clone_id = (await instance.getLatestId()).toNumber();
     await instance.burn(accounts[3], clone_id);
 
     // Balance of account[3] should be 0
     assert.equal(await instance.balanceOf(accounts[3]), 0)
 
-    // Try to access that clone_id, should fail
-    try {
-      await instance.getKudosById(clone_id);
-      assert.fail();
-    } catch (err) {
-      assert.ok(err);
-    }
+    // Total Supply should decrease by 1
+    let endSupply = (await instance.totalSupply()).toNumber();
+    assert.equal(endSupply, startSupply - 1);
+
+    // The kudos that was burned should be all 0's because it was deleted
+    let cloned_kudos = (await instance.getKudosById(clone_id)).map(x => x.toNumber());
+    assert.deepEqual(cloned_kudos, [0, 0, 0, 0]);
+
+    // Clone a new Kudos, make sure the kudos_id and totalSupply are correct
+    await instance.clone(accounts[3], kudos_id, numClones, {"from": accounts[3], "value": web3.toWei(priceFinney, 'finney')});
+    new_clone_id = (await instance.getLatestId()).toNumber();
+    newSupply = (await instance.totalSupply()).toNumber();
+    // The id sould always increment, even if a kudos is burned
+    assert.equal(new_clone_id, clone_id + 1);
+    // The startSupply should be the same as the newSupply, since we burned one
+    assert.equal(newSupply, startSupply);
   });
 
   it("should fail when trying to clone a kudos without enough ETH in msg.value", async () => {
