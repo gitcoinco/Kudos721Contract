@@ -16,7 +16,7 @@ contract("KudosTest", async(accounts) => {
     // but there was some issues with variables from one test polluting the other.
     let instance = await Kudos.deployed();
     await instance.mint(accounts[1], priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
-    let kudos_id = (await instance.totalSupply()).toNumber();
+    let kudos_id = (await instance.getLatestId()).toNumber();
 
     let kudos = (await instance.getKudosById(kudos_id)).map(x => x.toNumber());
     let expected_kudos = [priceFinney, numClonesAllowed, 0, kudos_id];
@@ -53,13 +53,13 @@ contract("KudosTest", async(accounts) => {
     // token owner -- accounts[1]
     // contract owner -- accounts[0]
     await instance.mint(accounts[1], priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
-    let kudos_id = (await instance.totalSupply()).toNumber();
+    let kudos_id = (await instance.getLatestId()).toNumber();
 
     let numClones = 1;
     let contractOwnerBalance = web3.eth.getBalance(accounts[0]);
     let tokenOwnerBalance = web3.eth.getBalance(accounts[1]);
     await instance.clone(accounts[2], kudos_id, numClones, {"from": accounts[1], "value": web3.toWei(priceFinney, 'finney')});
-    let cloned_id = (await instance.totalSupply()).toNumber();
+    let cloned_id = (await instance.getLatestId()).toNumber();
 
     // Check that the cloned_id is what we expect
     assert.equal(cloned_id, kudos_id + 1);
@@ -96,7 +96,7 @@ contract("KudosTest", async(accounts) => {
     // Mint a new Gen0 Kudos
     let instance = await Kudos.deployed();
     await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
-    let kudos_id = (await instance.totalSupply()).toNumber();
+    let kudos_id = (await instance.getLatestId()).toNumber();
 
     let newPriceFinney = 5;
     await instance.setPrice(kudos_id, newPriceFinney);
@@ -108,15 +108,15 @@ contract("KudosTest", async(accounts) => {
     // Mint a new Gen0 Kudos
     let instance = await Kudos.deployed();
     await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
-    let kudos_id = (await instance.totalSupply()).toNumber();
+    let kudos_id = (await instance.getLatestId()).toNumber();
 
     let startSupply = (await instance.totalSupply()).toNumber();
     let originalBalance = web3.eth.getBalance(accounts[0]);
     let numClones = 5;
     let msgValue = web3.toWei(priceFinney * numClones, 'finney');
     await instance.clone(accounts[1], kudos_id, numClones, {"from": accounts[1], "value": msgValue});
-    let cloned_id = (await instance.totalSupply()).toNumber();
-    let endSupply = cloned_id;
+    let cloned_id = (await instance.getLatestId()).toNumber();
+    let endSupply = (await instance.totalSupply()).toNumber();
 
     // Check that we made the right number of clones
     assert.ok(endSupply - startSupply == numClones);
@@ -167,7 +167,7 @@ contract("KudosTest", async(accounts) => {
     // Mint a new Gen0 Kudos
     let instance = await Kudos.deployed();
     await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
-    let kudos_id = (await instance.totalSupply()).toNumber();
+    let kudos_id = (await instance.getLatestId()).toNumber();
 
     let numClones = 1;
     try {
@@ -182,7 +182,7 @@ contract("KudosTest", async(accounts) => {
     // Mint a new Gen0 Kudos
     let instance = await Kudos.deployed();
     await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
-    let kudos_id = (await instance.totalSupply()).toNumber();
+    let kudos_id = (await instance.getLatestId()).toNumber();
 
     let numClones = 100;
     try {
@@ -197,11 +197,11 @@ contract("KudosTest", async(accounts) => {
     // Mint a new Gen0 Kudos
     let instance = await Kudos.deployed();
     await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
-    let kudos_id = (await instance.totalSupply()).toNumber();
+    let kudos_id = (await instance.getLatestId()).toNumber();
 
     let numClones = 1;
     await instance.clone(accounts[1], kudos_id, numClones, {"from": accounts[1], "value": web3.toWei(priceFinney, 'finney')});
-    let cloned_id = (await instance.totalSupply()).toNumber();
+    let cloned_id = (await instance.getLatestId()).toNumber();
     try {
       await instance.clone(accounts[1], cloned_id, numClones, {"from": accounts[1], "value": web3.toWei(priceFinney, 'finney')});
       assert.fail();
