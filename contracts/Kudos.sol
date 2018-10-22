@@ -19,6 +19,15 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
 
     Kudo[] public kudos;
     uint256 public cloneFeePercentage = 10;
+    bool public isMintable = true;
+
+    modifier mintable {
+        require(
+            isMintable == true,
+            "New kudos are no longer mintable on this contract.  Please see KUDOS_CONTRACT_MAINNET at http://gitcoin.co/l/gcsettings for latest address."
+        );
+        _;
+    }
 
     /// @dev mint(): Mint a new Gen0 Kudos.  These are the tokens that other Kudos will be "cloned from".
     /// @param _to Address to mint to.
@@ -26,7 +35,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
     /// @param _numClonesAllowed Maximum number of times this Kudos is allowed to be cloned.
     /// @param _tokenURI A URL to the JSON file containing the metadata for the Kudos.  See metadata.json for an example.
     /// @return the tokenId of the Kudos that has been minted.  Note that in a transaction only the tx_hash is returned.
-    function mint(address _to, uint256 _priceFinney, uint256 _numClonesAllowed, string _tokenURI) public payable onlyOwner returns (uint256 tokenId) {
+    function mint(address _to, uint256 _priceFinney, uint256 _numClonesAllowed, string _tokenURI) public payable mintable onlyOwner returns (uint256 tokenId) {
         uint256 _numClonesInWild = 0;
         uint256 _clonedFromId = 0;
 
@@ -55,7 +64,7 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
     /// @param _to The address to clone to.
     /// @param _tokenId The token id of the Kudos to clone and transfer.
     /// @param _numClonesRequested Number of clones to generate.
-    function clone(address _to, uint256 _tokenId, uint256 _numClonesRequested) public payable {
+    function clone(address _to, uint256 _tokenId, uint256 _numClonesRequested) public payable mintable {
         // Grab existing Kudo blueprint
         Kudo memory _kudo = kudos[_tokenId];
         uint256 cloningCost  = _kudo.priceFinney * 10**15 * _numClonesRequested;
@@ -123,6 +132,14 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
             _cloneFeePercentage >= 0 && _cloneFeePercentage <= 100,
             "Invalid range for cloneFeePercentage.  Must be between 0 and 100.");
         cloneFeePercentage = _cloneFeePercentage;
+    }
+
+    /// @dev setMintable(): set the isMintable public variable.  When set to `false`, no new 
+    ///                     kudos are allowed to be minted or cloned.  However, all of already
+    ///                     existing kudos will remain unchanged.
+    /// @param _isMintable flag for the mintable function modifier.
+    function setMintable(bool _isMintable) public onlyOwner {
+        isMintable = _isMintable;
     }
 
     /// @dev setPrice(): Update the Kudos listing price.
