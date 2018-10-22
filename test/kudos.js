@@ -210,7 +210,7 @@ contract("KudosTest", async(accounts) => {
     }
   })
 
-  it.only("should be able to stop all minting and cloning on the contract", async () => {
+  it("should be able to stop all minting and cloning on the contract", async () => {
     let instance = await Kudos.deployed();
     await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
     let kudos_id = (await instance.getLatestId()).toNumber();
