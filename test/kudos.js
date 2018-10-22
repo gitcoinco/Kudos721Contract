@@ -210,4 +210,29 @@ contract("KudosTest", async(accounts) => {
     }
   })
 
+  it("should be able to stop all minting and cloning on the contract", async () => {
+    let instance = await Kudos.deployed();
+    await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+    let kudos_id = (await instance.getLatestId()).toNumber();
+    let numClones = 1;
+    // Make sure clonging works also
+    await instance.clone(accounts[1], kudos_id, numClones, {"from": accounts[1], "value": priceWeiBN});
+    // Turn minting off
+    await instance.setMintable(false, {"from": accounts[0]});
+    // Cloning should no longer work
+    try {
+      await instance.clone(accounts[1], kudos_id, numClones, {"from": accounts[1], "value": priceWeiBN});
+      assert.fail();
+    } catch (err) {
+      assert.ok(err);
+    }
+    // Minting should no longer work
+    try {
+      await instance.mint(mintAddress, priceFinney, numClonesAllowed, tokenURI, {"from": accounts[0]});
+      assert.fail();
+    } catch (err) {
+      assert.ok(err);
+    }
+  })
+
 });
