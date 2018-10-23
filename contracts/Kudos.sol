@@ -183,6 +183,10 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
     /// @return the latest kudos id.
     function getLatestId() view public returns (uint256 tokenId)
     {
-        tokenId = kudos.length - 1;
+        if (kudos.length == 0) {
+            tokenId = 0;
+        } else {
+            tokenId = kudos.length - 1;
+        }
     }
 }
