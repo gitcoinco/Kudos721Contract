@@ -49,10 +49,10 @@ module.exports = {
     },
     rinkeby: {
       provider: function() {
-        return new HDWalletProvider(mnemonic, 'https://rinkeby.infura.io/' + token)
+        return new HDWalletProviderPriv(privkeys, 'https://rinkeby.infura.io/' + token)
       },
       network_id: 4,
-      from: '0xd386793f1db5f21609571c0164841e5ea2d33ad8',
+      from: '0x6239ff1040e412491557a7a02b2cbcc5ae85dc8f',
     },
     development: {
       host: "localhost",
