@@ -84,9 +84,6 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         uint256 tokenOwnerFee = cloningCost.sub(contractOwnerFee);
         ownerOf(_tokenId).transfer(tokenOwnerFee);
 
-        // Return the any leftvoer ETH to the sender
-        msg.sender.transfer(msg.value - contractOwnerFee - tokenOwnerFee);
-
         // Update original kudo struct in the array
         _kudo.numClonesInWild += _numClonesRequested;
         kudos[_tokenId] = _kudo;
@@ -109,6 +106,8 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
             string memory _tokenURI = tokenURI(_tokenId);
             _setTokenURI(newTokenId, _tokenURI);
         }
+        // Return the any leftvoer ETH to the sender
+        msg.sender.transfer(msg.value - contractOwnerFee - tokenOwnerFee);
     }
 
 
