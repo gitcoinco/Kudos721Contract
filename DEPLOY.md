@@ -2,7 +2,7 @@
 These instructions assume you are deploying to the **rinkeby network**.  Replace `rinkeby` with `localhost` or `mainnet` if you want to deploy to a different network.
 
 
-## Deploy Kudos tokens on the blockahin
+## Deploy Kudos tokens on the blockchain
 The latest code is on [Github](https://github.com/mbeacom/gitcoin-erc721/tree/master).
 
 The Kudos tokens need to exist on the blockchain before they can show up on the Gitcoin website.  The architecture design is "blockchain-first", meaning that the contract and kudos are completely independent from the Gitcoin Site.  Anyone can access them using web3.
@@ -74,11 +74,33 @@ The Gitcoin App is the main https://gitcoin.co site.  This part should be done a
 - `ssh ubuntu@34.219.65.167 -p 30606` to get into the staging server.
 - `cd gitcoin/coin` to get into the repository.
 - `git pull jasonrhaas kudos-v1` to pull down the latest code.
+- `vim app/app/.env` and update the environment variables as below.
+
+```
+OPENSEA_API=xxxx
+KUDOS_NETWORK=rinkeby
+KUDOS_OWNER_ACCOUNT=0x8B34b3E624A8dd3Ab4e85b490f6D5e775521d3C8
+KUDOS_PRIVATE_KEY=xxxx
+
+IPFS_HOST=ipfs.gitcoin.co
+IPFS_API_PORT=443
+IPFS_API_SCHEME=https
+```
+
+**Note:  Be careful with the private key.  Anyone with the private key has full access to this account!**
+
 - `bash scripts/deploy.bash jasonrhaas/kudos-v1` to run the deployment.  It should pull down the code, do pip installs, migrations, and install the crontabs.
 - `crontab -e` to inspect the crontab to make sure it matches the *scripts/crontab* file.  Comment out the Kudos jobs so we can run them manually.
 - `source ../gitcoin-37/bin/activate` to activate the virtual environment.
 - `python manage.py sync_kudos rinkeby opensea --start 1` to sync all of the kudos to the database.
 - `crontab -e` and uncomment out the kudos cronjobs.
+- Go to https://stage.gitcoin.co to see the site.  Might need to do a Hard Refresh and Empty Cache to see the latest updates.
+- Check Open Sea to make sure the Kudos token data is correct (image, link, properties)
+
+
+
+### Extra Info
+Additional information about the Gitcoin App.
 
 #### Environment Variables
 There are a few environment variable that need to be added for Kudos in the *.env* file.
@@ -86,9 +108,25 @@ There are a few environment variable that need to be added for Kudos in the *.en
 - `KUDOS_NETWORK` - The network to use for the Gitcoin App.  This affects what Kudos get displayed in the marketplace and in the profile.  For example, setting this to `rinkeby` will only show the Kudos for the _latest rinkeby contract_ in the marketplace and in user profiles.
 - `KUDOS_CONTRACT_RINKEBY` - The contract address on Rinkeby.  Can be normalized or checksummed.
 - `KUDOS_CONTRACT_MAINNET` - The contract address on Mainnet.  Can be normalized or checksummed.
+- `KUDOS_OWNER_ACCOUNT` - The contract account owner address.
+- `KUDOS_PRIVATE_KEY` - Private key for the above account.  Be careful dealing with private keys.
 - `OPENSEA_API` - API key to allow for Kudos syncing using Open Sea.  Syncing using the Open Sea API is the preferred way to sync from blockchain to the database.
 
 
 
 #### Cron jobs
-TBD
+These are the job that run to handle the kudos syncing.  Syncing the blockchain is a tricky business.  There are many ways to do it, and none of them are that great.  I decided to use the Open Sea API because it seems to be the most reliable of any other method Ive tried.
+
+The cronjobs are:
+
+```
+## KUDOS
+*/1 * * * * cd gitcoin/coin; bash scripts/run_management_command_if_not_already_running.bash sync_kudos rinkeby opensea --catchup >> /var/log/gitcoin/sync_kudos_catchup.log 2>&1
+*/10 * * * * cd gitcoin/coin; bash scripts/run_management_command_if_not_already_running.bash sync_kudos rinkeby opensea --start 1 >> /var/log/gitcoin/sync_kudos_all.log 2>&1
+```
+
+They both use the Open Sea API.
+
+The first job uses the `--catchup` to find the latest Kudos Id on the blockchain and the database, and sync the difference.
+
+The second job is a "full sync" of all the kudos.  This is mostly there as redundancy in case the first job fails for whatever reason.
