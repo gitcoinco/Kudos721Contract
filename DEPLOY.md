@@ -5,33 +5,38 @@ These instructions assume you are deploying to the **rinkeby network**.  Replace
 ## Deploy Kudos tokens on the blockchain
 The latest code is on [Github](https://github.com/mbeacom/gitcoin-erc721/tree/master).
 
-The Kudos tokens need to exist on the blockchain before they can show up on the Gitcoin website.  The architecture design is "blockchain-first", meaning that the contract and kudos are completely independent from the Gitcoin Site.  Anyone can access them using web3.
+The Kudos tokens need to exist on the blockchain before they can show up on the Gitcoin website.  The architecture design is "blockchain-first", meaning that the contract and Kudos are completely independent from the Gitcoin site.  Anyone can access them using web3 or Open Sea.
 
-After the Kudos are "minted", or "born" on the blockchain, they can be synchronized to the Gitcoin database.  The Django model for this is `kudos.models.Token`.  This table should never be changed directly, only updated using the `kudos.utils.sycn_db()` method.
+After the Kudos are "minted", or "born" on the blockchain, they can be synchronized to the Gitcoin database.  The Django model for this is `kudos.models.Token`.  This table should never be changed directly, only updated using the `kudos.utils.sync_db()` method.
 
 ### Deploying the contract
-First the contract needs to be deployed to the blockchain.  These steps apply to the *mbeacom/gitcoin-erc721.git* repository.
+First the contract needs to be deployed to the blockchain.  These steps apply to the *mbeacom/gitcoin-erc721.git* repository.ååå
 
 - `ssh -A root@209.97.155.182` to get into the kudosdemo server.  The contract deployment is done from here since the server contains the private key for the gitcoin account and all the software needed for the deploy.  Only deploy from the server to avoid putting the private key on your local machine.
 - `cd gitcoin-erc721`
-- `git pull master` to get the latest code.  
+- Go to the github page, and find the release that you want to use.  I recommend only using tagged releases as this the best way to remember what version of code you have deployed.
+- `git pull` to get the latest code.
+- `git checkout [tag]` to checkout the version you want.  For example, `git checkout v1.1.1`
 - Open the *truffle.js* and make sure the information is correct for your deploy.  Most importantly, check the `from` field to make sure it is the account you want to "own" the contract.  The owner of this account will basically have "admin" access to the contract.
+- `npm install -g truffle` if truffle is not already installed.
+- `npm install` to make sure you have all the dependencies.
 - `truffe migrate --reset --compile-all --network rinkeby` to compile the contract code and deploy it to rinkeby.
-- `node utils/contract_info.js abi` to output the abi code for the contract.  If you are on a mac, you can `| pbcopy` to pipe it directly to your clipboard.
 - `grep network -A30 build/contracts/Kudos.json` and find the network address for the network you are deploying to.  For rinkeby, the network id is 4.  For mainnet, the network id is 1.
 - Go to https://rinkeby.opensea.io, and click Develop --> Submit Dapps.
 - Enter the contract address above.  It should find the contract on rinkeby.  Click through until the end and you will probably get a 404 error.  Don't worry about this, it's still working.  **It is important that you do this before minting any tokens**.
+- `node utils/contract_info.js abi` to output the abi code for the contract.  If you are on a mac, you can `| pbcopy` to pipe it directly to your clipboard.
 - Take note of the abi code and the address, you will need to update the *gitcoinco/web.git* code with these values.
 
 ### Updating the Gitcoin/web.git code
 There are a couple things that need to be updated in the Gitcoin code to go along with a new contract.  These steps apply to the *gitcoinco/web.git* repository.
 
 - If new Kudos have been added to the *mbeacom/kudos-badges.git* repo:
-	- Copy the new images from that repo to *web/app/assets/v2/images/kudos*.  Be sure to get any images in sub folders as well.
+	- Copy the new images from that repo to *web/app/assets/v2/images/kudos/.*  Be sure to get any images in sub folders as well.
 	- Copy the *kudos.yaml* file to *web/app/kudos/kudos.yaml*
-	- Optionally, compress **only the new images** using the `svgo --disable=removeViewBox` command.
+	- Optionally, in the *gitcoinco/web* repo, compress **only the new images** using the `svgo --disable=removeViewBox` command.
 - Update the `KUDOS_CONTRACT_RINKEBY` value in *settings.py* and the `kudos_address` function in *abi.js* with the contract address.
 - Paste the abi code into *Kudos.json* and the `kudos_abi` variables in *abi.js*
+- Commit your changes, `git push` to master, and optionally tag a release.
 
 ### Minting the tokens
 Now that the contract is on the blockchain, we can "mint" new kudos tokens.  Note that this part is done from the kudosdemo server since we are _only_ minting tokens here, and _not_ syncing them to the database.
@@ -40,7 +45,7 @@ The command is a Django Management Command so the application needs to be set up
 
 - `ssh -A root@209.97.155.182` to get into the kudosdemo server.
 - `cd web` to get into the repository.
-- `git pull jasonrhaas kudos-v1` to pull down the latest code.
+- `git checkout kudos-v1 && git pull` to pull down the latest code.
 - `vim app/app/.env` and update the environment variables as below.
 
 ```
