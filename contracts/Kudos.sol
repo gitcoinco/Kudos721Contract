@@ -155,6 +155,13 @@ contract Kudos is ERC721Token("KudosToken", "KDO"), Ownable {
         kudos[_tokenId] = _kudo;
     }
 
+    /// @dev setTokenURI(): Set an existing token URI.
+    /// @param _tokenId The token id.
+    /// @param _tokenURI The tokenURI string.  Typically this will be a link to a json file on IPFS.
+    function setTokenURI(uint256 _tokenId, string _tokenURI) public onlyOwner {
+        _setTokenURI(_tokenId, _tokenURI);
+    }
+
     /// @dev getKudosById(): Return a Kudos struct/array given a Kudos Id. 
     /// @param _tokenId The Kudos Id.
     /// @return the Kudos struct, in array form.
