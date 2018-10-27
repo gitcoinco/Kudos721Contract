@@ -28,7 +28,10 @@ module.exports = {
       },
       network_id: 1, // Ethereum public network
       from: '0x6239ff1040e412491557a7a02b2cbcc5ae85dc8f',
-      gasPrice: 2000000000,
+      // Needed to set the gasPrice and Nonce in the console for this to work
+      // var contract = Kudos.new({gasPrice:5000000000, nonce: 64})
+      gasPrice: 5000000000,
+      // nonce: 64
       // gas: 5612388,
       // gas: 4612388
       // optional config values

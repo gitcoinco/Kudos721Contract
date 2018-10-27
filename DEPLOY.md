@@ -10,13 +10,13 @@ The Kudos tokens need to exist on the blockchain before they can show up on the 
 After the Kudos are "minted", or "born" on the blockchain, they can be synchronized to the Gitcoin database.  The Django model for this is `kudos.models.Token`.  This table should never be changed directly, only updated using the `kudos.utils.sync_db()` method.
 
 ### Deploying the contract
-First the contract needs to be deployed to the blockchain.  These steps apply to the *mbeacom/gitcoin-erc721.git* repository.ååå
+First the contract needs to be deployed to the blockchain.  These steps apply to the *mbeacom/gitcoin-erc721.git* repository.
 
 - `ssh -A root@209.97.155.182` to get into the kudosdemo server.  The contract deployment is done from here since the server contains the private key for the gitcoin account and all the software needed for the deploy.  Only deploy from the server to avoid putting the private key on your local machine.
 - `cd gitcoin-erc721`
 - Go to the github page, and find the release that you want to use.  I recommend only using tagged releases as this the best way to remember what version of code you have deployed.
 - `git pull` to get the latest code.
-- `git checkout [tag]` to checkout the version you want.  For example, `git checkout v1.1.1`
+- `git checkout [tag]` to checkout the version you want.  For example, `git checkout v1.1.2`
 - Open the *truffle.js* and make sure the information is correct for your deploy.  Most importantly, check the `from` field to make sure it is the account you want to "own" the contract.  The owner of this account will basically have "admin" access to the contract.
 - `npm install -g truffle` if truffle is not already installed.
 - `npm install` to make sure you have all the dependencies.
