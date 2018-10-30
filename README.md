@@ -34,3 +34,7 @@ play with.
 
 - Click the **Mint Gen0** button to mint your first Kudos!
 - See https://youtu.be/jl4p04t0hFE for more examples.
+
+
+<!-- Google Analytics -->
+<img src='https://ga-beacon.appspot.com/UA-102304388-1/gitcoinco/Kudos721Contract' style='width:1px; height:1px;' >
