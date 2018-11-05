@@ -2,7 +2,7 @@
 
 This contract is deployed to the mainnet at [0x2aea4add166ebf38b63d09a75de1a7b94aa24163](https://etherscan.io/address/0x2aea4add166ebf38b63d09a75de1a7b94aa24163)
 
-[Here is a link to the security audit which was performed by ZKLabs before launch.](https://hackmd.io/s/H1jzwl0iX).
+[Here is a link to the security audit which was performed by ZKLabs before launch.](docs/audit_report.pdf).
 
 ## Getting started
 First you need to install all of the requirements to run truffle and a local testrpc.
