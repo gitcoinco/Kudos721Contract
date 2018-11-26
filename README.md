@@ -36,6 +36,12 @@ To run the blockchain and app locally:
 play with.
 
 
+## See also
+
+[kudosbadges Repo](https://github.com/gitcoinco/kudosbadges)
+
+
+
 ## Using the Test App (Deprecated)
 
 - Click the **Mint Gen0** button to mint your first Kudos!
