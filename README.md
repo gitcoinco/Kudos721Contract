@@ -1,6 +1,6 @@
 # Kudos Contract
 
-This contract is deployed to the mainnet at [0x2aea4add166ebf38b63d09a75de1a7b94aa24163](https://etherscan.io/address/0x2aea4add166ebf38b63d09a75de1a7b94aa24163)
+This contract is deployed to the mainnet at [0x2aea4add166ebf38b63d09a75de1a7b94aa24163](https://etherscan.io/address/0x2aea4add166ebf38b63d09a75de1a7b94aa24163) and on rinkeby at [0x4077aE95EeC529D924571d00e81ECdE104601AE8](https://rinkeby.etherscan.io/address/0x4077aE95EeC529D924571d00e81ECdE104601AE8)
 
 [Here is a link to the security audit which was performed by ZKLabs before launch.](docs/audit_report.pdf).
 
