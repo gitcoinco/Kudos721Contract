@@ -38,8 +38,9 @@ play with.
 
 ## See also
 
-[kudosbadges Repo](https://github.com/gitcoinco/kudosbadges)
-
+- [kudosbadges Repo](https://github.com/gitcoinco/kudosbadges)
+- [kudos python client](https://github.com/OpenKudos/python_client)
+- [kudos contract Repo](https://github.com/gitcoinco/Kudos721Contract)
 
 
 ## Using the Test App (Deprecated)
