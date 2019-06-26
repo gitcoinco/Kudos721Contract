@@ -3,6 +3,9 @@ These instructions assume you are deploying to the **rinkeby network**.  Replace
 
 
 ## Deploy Kudos tokens on the blockchain
+
+First off, do you really need to deploy the Kudos contract again?  In most cases, you can just use the [existing Kudos contracts](https://github.com/gitcoinco/Kudos721Contract/blob/master/DEPLOY.md#django-app-deployment)...
+
 The latest code is on [Github](https://github.com/mbeacom/gitcoin-erc721/tree/master).
 
 The Kudos tokens need to exist on the blockchain before they can show up on the Gitcoin website.  The architecture design is "blockchain-first", meaning that the contract and Kudos are completely independent from the Gitcoin site.  Anyone can access them using web3 or Open Sea.
@@ -12,9 +15,10 @@ After the Kudos are "minted", or "born" on the blockchain, they can be synchroni
 ### Deploying the contract
 First the contract needs to be deployed to the blockchain.  These steps apply to the *mbeacom/gitcoin-erc721.git* repository.
 
-- `ssh -A root@209.97.155.182` to get into the kudosdemo server.  The contract deployment is done from here since the server contains the private key for the gitcoin account and all the software needed for the deploy.  Only deploy from the server to avoid putting the private key on your local machine.
-- `cd gitcoin-erc721`
-- Go to the github page, and find the release that you want to use.  I recommend only using tagged releases as this the best way to remember what version of code you have deployed.
+- setup Gitcoin Docker as specified [here](https://github.com/gitcoinco/web/blob/master/docs/RUNNING_LOCALLY_DOCKER.md)
+- Clone [this repo](https://github.com/gitcoinco/Kudos721Contract) in the root dir
+- `cd` into this repo
+- Go to the github page, and find the release that you want to use.  I recommend only using tagged releases as this the best way to remember what version of code you have deployed.  
 - `git pull` to get the latest code.
 - `git checkout [tag]` to checkout the version you want.  For example, `git checkout v1.1.2`
 - Open the *truffle.js* and make sure the information is correct for your deploy.  Most importantly, check the `from` field to make sure it is the account you want to "own" the contract.  The owner of this account will basically have "admin" access to the contract.
@@ -119,6 +123,7 @@ There are a few environment variable that need to be added for Kudos in the *.en
 - `KUDOS_PRIVATE_KEY` - Private key for the above account.  Be careful dealing with private keys.
 - `OPENSEA_API` - API key to allow for Kudos syncing using Open Sea.  Syncing using the Open Sea API is the preferred way to sync from blockchain to the database.
 
+Note: There is an existing Kudos contract is deployed to the mainnet at [0x2aea4add166ebf38b63d09a75de1a7b94aa24163](https://etherscan.io/address/0x2aea4add166ebf38b63d09a75de1a7b94aa24163) and on rinkeby at [0x4077aE95EeC529D924571d00e81ECdE104601AE8](https://rinkeby.etherscan.io/address/0x4077aE95EeC529D924571d00e81ECdE104601AE8)
 
 
 #### Cron jobs
