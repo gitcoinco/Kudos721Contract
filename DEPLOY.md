@@ -94,14 +94,16 @@ IPFS_API_SCHEME=https
 
 **Note:  Be careful with the private key.  Anyone with the private key has full access to this account!**
 
-- `bash scripts/deploy.bash jasonrhaas/kudos-v1` to run the deployment.  It should pull down the code, do pip installs, migrations, and install the crontabs.
-- `crontab -e` to inspect the crontab to make sure it matches the *scripts/crontab* file.  Comment out the Kudos jobs so we can run them manually.
-- `source ../gitcoin-37/bin/activate` to activate the virtual environment.
 - `python manage.py sync_kudos rinkeby opensea --start 1` to sync all of the kudos to the database.
-- `crontab -e` and uncomment out the kudos cronjobs.
-- Go to https://stage.gitcoin.co to see the site.  Might need to do a Hard Refresh and Empty Cache to see the latest updates.
+- Go to https://localhost:8000/kudos to see the site.  Might need to do a Hard Refresh and Empty Cache to see the latest updates.
 - Check Open Sea to make sure the Kudos token data is correct (image, link, properties)
 
+
+### Mint a new Kudos on Rinkeby
+
+- setup Gitcoin Docker as specified [here](https://github.com/gitcoinco/web/blob/master/docs/RUNNING_LOCALLY_DOCKER.md)
+- run this command `./manage.py mint_all_kudos --gitcoin_account mainnet kudos/kudos.yaml --gas_price_gwei=5 --live --filter_svg=mythx_platform.svg` where `mythx_platform.svg` is the svg of the kudos from the `kudos.yaml` file that you want to mint
+- success!
 
 
 ### Extra Info
