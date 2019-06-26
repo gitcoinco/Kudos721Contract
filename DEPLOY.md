@@ -98,6 +98,7 @@ IPFS_API_SCHEME=https
 
 **Note:  Be careful with the private key.  Anyone with the private key has full access to this account!**
 
+- `cd app`
 - `python manage.py sync_kudos rinkeby opensea --start 1` to sync all of the kudos to the database.
 - Go to https://localhost:8000/kudos to see the site.  Might need to do a Hard Refresh and Empty Cache to see the latest updates.
 - Check Open Sea to make sure the Kudos token data is correct (image, link, properties)
