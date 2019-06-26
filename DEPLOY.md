@@ -76,9 +76,9 @@ The Gitcoin App is the main https://gitcoin.co site.  This part should be done a
 
 ### Django App Deployment
 
-- `ssh ubuntu@34.219.65.167 -p 30606` to get into the staging server.
-- `cd gitcoin/coin` to get into the repository.
-- `git pull jasonrhaas kudos-v1` to pull down the latest code.
+- setup Gitcoin Docker as specified [here](https://github.com/gitcoinco/web/blob/master/docs/RUNNING_LOCALLY_DOCKER.md)
+- `docker-compose exec web /bin/bash` to get into Docker.
+- `git pull origin master` to pull down the latest code.
 - `vim app/app/.env` and update the environment variables as below.
 
 ```
